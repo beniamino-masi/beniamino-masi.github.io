@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulatore Elettorale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;       
+            --primary-dark: #1e40af;
+            --secondary: #64748b;     
+            --bg-app: #f8fafc;        
+            --surface: #ffffff;       
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --highlight: #facc15;     
+            --apparent: #8b5cf6;      
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* --- HEADER --- */
+        .app-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .app-header h1 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin: 0;
+            color: var(--primary-dark);
+            letter-spacing: -0.02em;
+        }
+        .app-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: 8px;
+        }
+
+        /* --- CARDS & PANELS --- */
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border);
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+
+        /* --- INPUTS --- */
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 1rem;
+            color: var(--text-main);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box; 
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* --- BUTTONS --- */
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 12px 24px;
+            width: 100%;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 16px;
+        }
+        .btn-secondary:hover {
+            background: var(--bg-app);
+            color: var(--text-main);
+            border-color: #cbd5e1;
+        }
+
+        .btn-action {
+            background: #e0f2fe;
+            color: var(--primary);
+            padding: 8px 12px;
+            width: 100%;
+            font-size: 0.85rem;
+        }
+        .btn-action:hover { background: #bae6fd; }
+
+        .btn-danger-text {
+            background: none;
+            color: var(--danger);
+            font-size: 0.85rem;
+            padding: 4px;
+            text-decoration: underline;
+            opacity: 0.8;
+        }
+        .btn-danger-text:hover { opacity: 1; }
+
+        .btn-icon-remove {
+            background: #fef2f2;
+            color: var(--danger);
+            width: 36px;
+            height: 38px;
+            padding: 0;
+            border: 1px solid #fecaca;
+        }
+        .btn-icon-remove:hover { background: #fee2e2; }
+
+        /* --- TOGGLES & SWITCHES --- */
+        .mode-switch {
+            display: flex;
+            background: var(--border);
+            border-radius: 8px;
+            padding: 4px;
+            cursor: pointer;
+        }
+        .mode-option {
+            flex: 1;
+            text-align: center;
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: 0.3s;
+        }
+        .mode-option.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-weight: 700;
+        }
+
+        /* --- COALITIONS GRID --- */
+        .coalitions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .coalition-card {
+            border-top: 4px solid var(--border);
+            position: relative;
+        }
+        .coalition-card.is-winner { border-top-color: var(--success); }
+        .coalition-card.is-apparented { border-top-color: var(--apparent); }
+
+        .coalition-header {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--bg-app);
+        }
+        
+        /* LIVE TOTALS BADGE */
+        .live-total-badge {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--primary);
+            background: #eff6ff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-top: 5px;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .winner-checkbox {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--success);
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .apparent-checkbox {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--apparent);
+            cursor: pointer;
+        }
+        
+        .coalition-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .party-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        /* --- RESULTS SECTION --- */
+        #results {
+            display: none;
+            margin-top: 60px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hemicycle-wrapper {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .hemicycle-dot { transition: all 0.3s ease; }
+        .hemicycle-dot:hover { r: 10px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); z-index: 100; cursor: help; }
+
+        .result-group {
+            border-left: 5px solid #ccc;
+            margin-bottom: 24px;
+        }
+        .result-group.winner { border-left-color: var(--success); background-color: #f0fdf4; border: 1px solid #bbf7d0; border-left-width: 5px;}
+        .result-group.loser { border-left-color: var(--danger); background-color: #fef2f2; border: 1px solid #fecaca; border-left-width: 5px;}
+        .result-group.apparented { border-left-color: var(--apparent); background-color: #f5f3ff; border: 1px solid #ddd6fe; border-left-width: 5px;}
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .seats-badge {
+            background: var(--text-main);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .seats-badge.winner { background: var(--success); }
+        .seats-badge.loser { background: var(--danger); }
+        .seats-badge.apparented { background: var(--apparent); }
+        .seats-badge.zero { background: var(--text-muted); opacity: 0.5; }
+
+        .party-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+        .party-item:last-child { border-bottom: none; }
+
+        /* Custom Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+            margin-left: 10px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--highlight); }
+        input:checked + .slider:before { transform: translateX(16px); }
+        
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <header class="app-header">
+        <h1>Simulatore Elezioni Comunali</h1>
+    </header>
+
+    <div class="card">
+        <div class="config-grid">
+            <div>
+                <label>Modalità Input</label>
+                <div class="mode-switch" onclick="toggleInputMode()">
+                    <div id="modeVotes" class="mode-option active">Voti Assoluti</div>
+                    <div id="modePercent" class="mode-option">% Percentuali</div>
+                </div>
+            </div>
+
+            <div id="totalVotesContainer" style="display:none;">
+                <label style="color:var(--primary);">Totale Voti Validi (Stima)</label>
+                <input type="number" id="estimatedTotalVotes" value="40000" style="font-weight:bold; color:var(--primary);" oninput="recalcLiveTotals()">
+            </div>
+
+            <div>
+                <label>Seggi Consiglio</label>
+                <input type="number" id="totalSeats" value="32">
+            </div>
+
+            <div>
+                <label>Soglia Sbarramento (%)</label>
+                <input type="number" id="threshold" value="3" step="0.1">
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button onclick="saveScenario()" class="btn-secondary">💾 Salva</button>
+            <button onclick="loadSavedScenario()" class="btn-secondary">📂 Carica</button>
+            <div style="flex-grow:1;"></div>
+            <button onclick="loadScenario('Pisa2026')" class="btn-secondary" style="border-color:var(--primary); color:var(--primary);">
+                📊 Carica simulazione esempio Pisa
+            </button>
+            <button onclick="resetData()" class="btn-secondary">Reset</button>
+        </div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 style="margin:0;">Coalizioni e Liste</h3>
+        <button onclick="addCoalition()" class="btn-secondary" style="background:var(--primary); color:white; border:none;">+ Nuova Coalizione</button>
+    </div>
+
+    <div id="coalitionsContainer" class="coalitions-grid"></div>
+
+    <button class="btn-primary" onclick="calculateResults()">
+        Calcola Distribuzione
+    </button>
+
+    <div id="results">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="margin:0;">Risultati Simulazione</h2>
+            <button onclick="copyToClipboard()" class="btn-secondary">📋 Copia Report</button>
+        </div>
+
+        <div id="resultsSummary" style="margin-bottom:20px; font-weight:600; color:var(--text-muted); text-align:center;"></div>
+
+        <div class="hemicycle-wrapper">
+            <svg id="hemicycleSvg" width="600" height="260" viewBox="0 0 600 260" style="display:inline-block; max-width:100%;"></svg>
+        </div>
+
+        <div id="resultsDetails"></div>
+    </div>
+
+</div>
+
+<script>
+    let coalitions = [];
+    let inputMode = 'votes'; 
+    let lastCalculationResult = null; 
+    let highlightedPartyName = null; 
+    let textReport = "";
+
+    function toggleInputMode() {
+        inputMode = inputMode === 'votes' ? 'percent' : 'votes';
+        document.getElementById('modeVotes').classList.toggle('active', inputMode === 'votes');
+        document.getElementById('modePercent').classList.toggle('active', inputMode === 'percent');
+        document.getElementById('totalVotesContainer').style.display = inputMode === 'percent' ? 'block' : 'none';
+        renderCoalitions(); 
+    }
+
+    function resetData() {
+        coalitions = [{ id: 1, name: "Coalizione A", isWinner: true, isApparented: false, parties: [{ name: "Lista 1", value: 0 }] }];
+        highlightedPartyName = null;
+        renderCoalitions();
+        document.getElementById('results').style.display = 'none';
+    }
+
+    // --- LIVE TOTALS CALCULATION ---
+    function recalcLiveTotals() {
+        let grandTotal = 0;
+        let isPercent = (inputMode === 'percent');
+        
+        coalitions.forEach(col => {
+            col.tempSum = 0;
+            col.parties.forEach(p => { col.tempSum += p.value; });
+            grandTotal += col.tempSum;
+        });
+
+        let baseForPercent = isPercent ? 100 : grandTotal;
+        if(baseForPercent === 0) baseForPercent = 1;
+
+        coalitions.forEach((col, index) => {
+            let el = document.getElementById(`live-total-${index}`);
+            if(el) {
+                let suffix = isPercent ? '%' : ' voti';
+                let percentVal = 0;
+                
+                if (isPercent) percentVal = col.tempSum;
+                else percentVal = (col.tempSum / baseForPercent) * 100;
+                
+                el.innerHTML = `Totale: ${col.tempSum.toLocaleString()}${suffix} <span style="font-weight:400; color:#64748b; margin-left:5px;">(${percentVal.toFixed(1)}%)</span>`;
+            }
+        });
+    }
+
+    // --- LOAD SCENARIO (FIXED) ---
+    function loadScenario(type) {
+        if(type === 'Pisa2026') {
+            if(inputMode === 'percent') {
+                 coalitions = [
+                    { id: 1, name: "Centrosinistra", isWinner: true, isApparented: false, parties: [
+                        { name: "PD", value: 28.5 }, { name: "AVS", value: 8.5 }, 
+                        { name: "La Città delle Persone", value: 3.8 }, { name: "M5S", value: 3.5 }, { name: "Terzo Polo", value: 5.5 }
+                    ]},
+                    { id: 2, name: "Centrodestra", isWinner: false, isApparented: false, parties: [
+                        { name: "FdI", value: 22.0 }, { name: "Lega", value: 10.0 }, 
+                        { name: "FI", value: 6.5 }, { name: "Civica Sindaco", value: 7.5 }
+                    ]},
+                    { id: 3, name: "Ucic-PRC", isWinner: false, isApparented: false, parties: [
+                        { name: "Una città in comune", value: 7.0 }
+                    ]}
+                ];
+                document.getElementById('estimatedTotalVotes').value = 40000;
+            } else {
+                coalitions = [
+                    { id: 1, name: "Centrosinistra", isWinner: true, isApparented: false, parties: [
+                        { name: "PD", value: 11500 }, { name: "AVS", value: 3500 }, 
+                        { name: "La Città delle Persone", value: 1500 }, { name: "M5S", value: 1500 }, { name: "Terzo Polo", value: 2200 }
+                    ]},
+                    { id: 2, name: "Centrodestra", isWinner: false, isApparented: false, parties: [
+                        { name: "FdI", value: 8500 }, { name: "Lega", value: 4000 }, 
+                        { name: "FI", value: 2500 }, { name: "Civica Sindaco", value: 3000 }
+                    ]},
+                    { id: 3, name: "Ucic-PRC", isWinner: false, isApparented: false, parties: [
+                        { name: "Una città in comune", value: 2800 }
+                    ]}
+                ];
+            }
+            renderCoalitions();
+        }
+    }
+
+    function renderCoalitions() {
+        const container = document.getElementById('coalitionsContainer');
+        container.innerHTML = '';
+        const placeholderTxt = inputMode === 'percent' ? '%' : 'Voti';
+        const stepValue = inputMode === 'percent' ? '0.1' : '1';
+
+        coalitions.forEach((col, cIndex) => {
+            let partiesHtml = '';
+            col.parties.forEach((party, pIndex) => {
+                let val = party.value > 0 ? party.value : '';
+                partiesHtml += `
+                    <div class="party-row">
+                        <input type="text" placeholder="Nome Lista" value="${party.name}" onchange="updateParty(${cIndex}, ${pIndex}, 'name', this.value)">
+                        <input type="number" placeholder="${placeholderTxt}" value="${val}" step="${stepValue}" oninput="updatePartyValue(${cIndex}, ${pIndex}, this.value)">
+                        <button class="btn-icon-remove" onclick="removeParty(${cIndex}, ${pIndex})" title="Rimuovi Lista">✕</button>
+                    </div>
+                `;
+            });
+
+            let borderClass = '';
+            if(col.isWinner) borderClass = 'is-winner';
+            else if(col.isApparented) borderClass = 'is-apparented';
+
+            let optionsHtml = '';
+            if(col.isWinner) {
+                optionsHtml = `<label class="winner-checkbox"><input type="radio" name="winner" checked disabled> 🏆 Vincente</label>`;
+            } else {
+                optionsHtml = `
+                    <div class="coalition-options">
+                        <label class="winner-checkbox" style="color:#64748b; font-weight:normal;">
+                            <input type="radio" name="winner" onclick="setWinner(${cIndex})"> Vince
+                        </label>
+                        <label class="apparent-checkbox">
+                            <input type="checkbox" ${col.isApparented ? 'checked' : ''} onchange="setApparented(${cIndex}, this.checked)"> Apparentamento
+                        </label>
+                    </div>
+                `;
+            }
+
+            const html = `
+                <div class="card coalition-card ${borderClass}">
+                    <div class="coalition-header">
+                        <input type="text" value="${col.name}" onchange="updateCoalitionName(${cIndex}, this.value)" style="font-weight:700; border:none; border-bottom:1px solid #e2e8f0; width:55%; padding-left:0;">
+                        <div id="live-total-${cIndex}" class="live-total-badge">Totale: 0</div>
+                    </div>
+                    ${partiesHtml}
+                    <button class="btn-action" onclick="addParty(${cIndex})">+ Aggiungi Lista</button>
+                    ${optionsHtml}
+                    <div style="margin-top:15px; text-align:right;">
+                        <button class="btn-danger-text" onclick="removeCoalition(${cIndex})">Elimina Coalizione</button>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+        recalcLiveTotals();
+    }
+
+    function updateParty(cIndex, pIndex, field, value) {
+        if(field === 'name') coalitions[cIndex].parties[pIndex].name = value;
+    }
+    
+    function updatePartyValue(cIndex, pIndex, value) {
+        let parsed = parseFloat(value) || 0;
+        coalitions[cIndex].parties[pIndex].value = parsed;
+        recalcLiveTotals();
+    }
+
+    function updateCoalitionName(cIndex, value) { coalitions[cIndex].name = value; }
+    
+    function addParty(cIndex) { 
+        let nextNum = coalitions[cIndex].parties.length + 1;
+        coalitions[cIndex].parties.push({ name: "Lista " + nextNum, value: 0 }); 
+        renderCoalitions(); 
+    }
+    
+    function removeParty(cIndex, pIndex) { coalitions[cIndex].parties.splice(pIndex, 1); renderCoalitions(); }
+    
+    function addCoalition() { 
+        let nextNum = coalitions.length + 1;
+        coalitions.push({ id: Date.now(), name: "Coalizione " + nextNum, isWinner: false, isApparented: false, parties: [{ name: "Lista 1", value: 0 }] }); 
+        renderCoalitions(); 
+    }
+    
+    function removeCoalition(index) { if(confirm("Eliminare questa coalizione?")) { coalitions.splice(index, 1); renderCoalitions(); }}
+    function setWinner(index) { 
+        coalitions.forEach((c, i) => { c.isWinner = (i === index); if(c.isWinner) c.isApparented = false; }); 
+        renderCoalitions(); 
+    }
+    function setApparented(index, isChecked) {
+        coalitions[index].isApparented = isChecked;
+        if(isChecked) coalitions[index].isWinner = false;
+        renderCoalitions();
+    }
+
+    // --- CALCOLO CORE CON CHECK 50% ---
+    function calculateResults() {
+        highlightedPartyName = null; 
+        textReport = "🗳️ *SIMULAZIONE ELETTORALE*\n\n";
+
+        const totalSeats = parseInt(document.getElementById('totalSeats').value);
+        const thresholdPercent = parseFloat(document.getElementById('threshold').value);
+        const estimatedTotal = parseInt(document.getElementById('estimatedTotalVotes').value) || 0;
+        
+        if(inputMode === 'percent' && estimatedTotal <= 0) { alert("Inserisci Totale Voti Stimati."); return; }
+
+        let grandTotalVotes = 0;
+        let simCoalitions = JSON.parse(JSON.stringify(coalitions)); 
+        simCoalitions.forEach(col => {
+            col.totalVotes = 0;
+            col.parties.forEach(p => {
+                p.votes = inputMode === 'percent' ? Math.round((p.value / 100) * estimatedTotal) : p.value;
+                col.totalVotes += p.votes;
+            });
+            grandTotalVotes += col.totalVotes;
+        });
+
+        const absoluteMajority = Math.floor(grandTotalVotes / 2) + 1;
+        let firstRoundWinner = simCoalitions.find(c => c.totalVotes >= absoluteMajority);
+        let winningCoalition = null;
+        let isFirstRoundVictory = false;
+
+        if (firstRoundWinner) {
+            alert(`⚠️ ATTENZIONE: La coalizione "${firstRoundWinner.name}" ha superato il 50% (${firstRoundWinner.totalVotes.toLocaleString()} voti).\nVittoria al Primo Turno!`);
+            isFirstRoundVictory = true;
+            winningCoalition = firstRoundWinner;
+            simCoalitions.forEach(c => {
+                c.isWinner = (c.id === firstRoundWinner.id);
+                c.isApparented = false; 
+            });
+        } else {
+            winningCoalition = simCoalitions.find(c => c.isWinner);
+        }
+
+        if(!winningCoalition) { alert("Nessuna coalizione sopra il 50% e nessun vincitore ballottaggio selezionato!"); return; }
+
+        let apparentedCoalitions = [];
+        let losingCoalitions = [];
+
+        simCoalitions.forEach(col => {
+            if (col.id === winningCoalition.id) return; 
+            
+            if (col.isApparented && !isFirstRoundVictory) {
+                apparentedCoalitions.push(col);
+            } else {
+                if(col.totalVotes > 0) losingCoalitions.push(col);
+            }
+        });
+
+        const thresholdVotes = grandTotalVotes * (thresholdPercent / 100);
+        
+        textReport += `📊 Base Calcolo: ${grandTotalVotes.toLocaleString()}\n`;
+        textReport += `🚧 Soglia ${thresholdPercent}%: ${Math.floor(thresholdVotes)}\n`;
+        if(isFirstRoundVictory) textReport += `🚨 VITTORIA AL PRIMO TURNO\n\n`;
+        else textReport += `⚔️ BALLOTTAGGIO\n\n`;
+
+        const majoritySeats = Math.ceil(totalSeats * 0.6); 
+        const minoritySeats = totalSeats - majoritySeats;
+
+        let majorityPoolParties = [];
+        winningCoalition.parties.forEach(p => {
+            if(p.votes >= thresholdVotes) majorityPoolParties.push({...p, originalCoalition: winningCoalition.id});
+        });
+        apparentedCoalitions.forEach(acol => {
+            acol.parties.forEach(p => {
+                if(p.votes >= thresholdVotes) majorityPoolParties.push({...p, originalCoalition: acol.id});
+            });
+        });
+
+        let majorityResult = dHondtWithGap(majorityPoolParties, majoritySeats);
+
+        let oppositionGroups = losingCoalitions.map(c => ({ name: c.name, votes: c.totalVotes, originalObj: c, isCoalition: true }));
+        oppositionGroups = oppositionGroups.filter(g => g.votes >= thresholdVotes);
+        let oppositionGroupResult = dHondtWithGap(oppositionGroups, minoritySeats);
+
+        let finalOutput = [];
+        let allSeatsForHemicycle = []; 
+
+        let winnerPartiesResult = majorityResult.distribution.filter(p => p.originalCoalition === winningCoalition.id);
+        let winnerSeatsTotal = winnerPartiesResult.reduce((a, b) => a + b.seats, 0);
+        winnerPartiesResult.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'winner', party: p.name }); });
+
+        finalOutput.push({
+            name: winningCoalition.name, isWinner: true, isApparented: false,
+            totalVotes: winningCoalition.totalVotes, seatsTotal: winnerSeatsTotal,
+            details: winnerPartiesResult, mayorSeat: false
+        });
+
+        apparentedCoalitions.forEach(acol => {
+            let acolPartiesResult = majorityResult.distribution.filter(p => p.originalCoalition === acol.id);
+            let acolSeatsTotal = acolPartiesResult.reduce((a, b) => a + b.seats, 0);
+            acolPartiesResult.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'winner', party: p.name }); });
+
+            finalOutput.push({
+                name: acol.name + " (App.)", isWinner: false, isApparented: true,
+                totalVotes: acol.totalVotes, seatsTotal: acolSeatsTotal,
+                details: acolPartiesResult, mayorSeat: false 
+            });
+        });
+
+        oppositionGroupResult.distribution.forEach(groupSeat => {
+            let coalition = groupSeat.originalObj;
+            let seatsForCoalition = groupSeat.seats;
+            if (seatsForCoalition > 0) {
+                allSeatsForHemicycle.push({ type: 'loser', party: "Candidato Sindaco " + coalition.name }); 
+                
+                let availableForLists = seatsForCoalition - 1;
+                let validLists = coalition.parties.filter(p => p.votes >= thresholdVotes);
+                let listResult = { distribution: validLists.map(p => ({...p, seats: 0, gap: null })) };
+                if (availableForLists > 0) {
+                    listResult = dHondtWithGap(validLists, availableForLists);
+                    listResult.distribution.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'loser', party: p.name }); });
+                }
+                finalOutput.push({
+                    name: coalition.name, isWinner: false, isApparented: false,
+                    totalVotes: coalition.totalVotes, seatsTotal: seatsForCoalition,
+                    details: listResult.distribution, mayorSeat: true
+                });
+            }
+        });
+
+        finalOutput.forEach(res => {
+            let icon = "🔻";
+            if(res.isWinner) icon = "🏆";
+            if(res.isApparented) icon = "🤝";
+            textReport += `${icon} *${res.name.toUpperCase()}*: ${res.seatsTotal} Seggi\n`;
+            if(res.mayorSeat) textReport += `   👤 1 Seggio Sindaco\n`;
+            res.details.sort((a,b) => b.votes - a.votes);
+            res.details.forEach(p => {
+                if(p.seats > 0) textReport += `   ✅ ${p.name}: ${p.seats} (${p.votes.toLocaleString()})\n`;
+                else if (p.gap !== null && p.votes >= thresholdVotes) textReport += `   Mancano ${p.gap} voti per un seggio in più\n`;
+            });
+            textReport += "\n";
+        });
+
+        lastCalculationResult = { seatsData: allSeatsForHemicycle, totalSeats: totalSeats };
+        drawHemicycle(allSeatsForHemicycle, totalSeats);
+        renderResults(finalOutput, grandTotalVotes, thresholdVotes);
+    }
+
+    // --- UTILS ---
+    function dHondtWithGap(candidates, seatsAvailable) {
+        if(seatsAvailable === 0) return { distribution: candidates, cutoff: 0 };
+        let distribution = candidates.map(c => ({ ...c, seats: 0, nextDivisor: 1, gap: null }));
+        let quotients = [];
+        distribution.forEach((cand, idx) => {
+            for(let i = 1; i <= seatsAvailable; i++) quotients.push({ q: cand.votes / i, partyIdx: idx, divisor: i });
+        });
+        quotients.sort((a, b) => b.q - a.q);
+        let lowestWinningQuotient = 0;
+        for(let i = 0; i < seatsAvailable; i++) {
+            let winner = quotients[i];
+            distribution[winner.partyIdx].seats++;
+            distribution[winner.partyIdx].nextDivisor = winner.divisor + 1;
+            lowestWinningQuotient = winner.q;
+        }
+        distribution.forEach(cand => {
+            let nextPotentialQ = cand.votes / cand.nextDivisor;
+            if (nextPotentialQ < lowestWinningQuotient) {
+                let votesNeeded = Math.ceil((lowestWinningQuotient * cand.nextDivisor) - cand.votes) + 1;
+                cand.gap = votesNeeded > 0 ? votesNeeded : 1;
+            } else { cand.gap = null; }
+        });
+        return { distribution: distribution, cutoff: lowestWinningQuotient };
+    }
+
+    function setHighlight(partyName) {
+        if (highlightedPartyName === partyName) highlightedPartyName = null;
+        else highlightedPartyName = partyName;
+        if(lastCalculationResult) drawHemicycle(lastCalculationResult.seatsData, lastCalculationResult.totalSeats);
+        const allChecks = document.querySelectorAll('.party-highlight-check');
+        allChecks.forEach(chk => { chk.checked = (chk.value === highlightedPartyName); });
+    }
+
+    function drawHemicycle(seatsData, totalSeats) {
+        const svg = document.getElementById('hemicycleSvg');
+        svg.innerHTML = ''; 
+        const majoritySeats = seatsData.filter(s => s.type === 'winner');
+        const oppositionSeats = seatsData.filter(s => s.type !== 'winner');
+        const totalMajority = majoritySeats.length;
+        const totalOpposition = oppositionSeats.length;
+        let drawnMajIndex = 0;
+        let drawnOppIndex = 0;
+        const centerX = 300; const centerY = 240; const maxRadius = 190; const rowGap = 35;
+        let numRows = totalSeats > 70 ? 4 : (totalSeats > 40 ? 3 : (totalSeats < 15 ? 1 : 2));
+        let rowRadii = []; let totalArcLength = 0;
+        let startRadius = maxRadius - ((numRows - 1) * rowGap);
+        for(let i=0; i<numRows; i++) { let r = startRadius + (i * rowGap); rowRadii.push(r); totalArcLength += r; }
+        let seatsPerRow = []; let seatsAssigned = 0;
+        for(let i=0; i<numRows; i++) {
+            if (i === numRows - 1) seatsPerRow.push(totalSeats - seatsAssigned);
+            else { let count = Math.round(totalSeats * (rowRadii[i] / totalArcLength)); seatsPerRow.push(count); seatsAssigned += count; }
+        }
+        for (let r = numRows - 1; r >= 0; r--) {
+            let radius = rowRadii[r];
+            let rowCapacity = seatsPerRow[r];
+            let majInThisRow = Math.round(rowCapacity * (totalMajority / totalSeats));
+            if (majInThisRow > (totalMajority - drawnMajIndex)) majInThisRow = totalMajority - drawnMajIndex;
+            if (r === 0 && (totalMajority - drawnMajIndex) > 0) majInThisRow = totalMajority - drawnMajIndex; 
+            let oppInThisRow = rowCapacity - majInThisRow;
+            if (oppInThisRow > (totalOpposition - drawnOppIndex)) oppInThisRow = totalOpposition - drawnOppIndex;
+            let rowData = [];
+            rowData.push(...majoritySeats.slice(drawnMajIndex, drawnMajIndex + majInThisRow));
+            rowData.push(...oppositionSeats.slice(drawnOppIndex, drawnOppIndex + oppInThisRow));
+            drawnMajIndex += majInThisRow; drawnOppIndex += oppInThisRow;
+            let startAngle = Math.PI * 0.95; let endAngle = Math.PI * 0.05;
+            let angleStep = rowCapacity > 1 ? (startAngle - endAngle) / (rowCapacity - 1) : 0;
+            for (let s = 0; s < rowData.length; s++) {
+                let angle = rowCapacity === 1 ? Math.PI / 2 : startAngle - (s * angleStep);
+                let x = centerX + radius * Math.cos(angle);
+                let y = centerY - radius * Math.sin(angle);
+                let seatInfo = rowData[s] || { type: 'empty', party: 'N/A' };
+                let finalColor;
+                if (highlightedPartyName && seatInfo.party === highlightedPartyName) finalColor = '#facc15'; 
+                else {
+                    finalColor = (seatInfo.type === 'winner') ? '#10b981' : '#ef4444';
+                    if(seatInfo.party && seatInfo.party.includes("Candidato Sindaco") && !highlightedPartyName) finalColor = '#b91c1c';
+                }
+                let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", x); circle.setAttribute("cy", y); circle.setAttribute("r", 7);
+                circle.setAttribute("fill", finalColor);
+                circle.setAttribute("stroke", "white"); circle.setAttribute("stroke-width", "1");
+                circle.classList.add("hemicycle-dot");
+                let title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+                title.textContent = seatInfo.party;
+                circle.appendChild(title);
+                svg.appendChild(circle);
+            }
+        }
+    }
+
+    function renderResults(results, totalVotes, threshold) {
+        document.getElementById('resultsSummary').innerHTML = `Base Calcolo: ${totalVotes.toLocaleString()} voti • Soglia: ${Math.floor(threshold)}`;
+        const container = document.getElementById('resultsDetails');
+        container.innerHTML = '';
+        results.forEach(res => {
+            let detailsHtml = res.mayorSeat ? `<div class="mayor-seat"><span>👤</span> <strong>1 Seggio Sindaco</strong></div>` : '';
+            res.details.sort((a,b) => b.votes - a.votes);
+            res.details.forEach(party => {
+                let perc = totalVotes > 0 ? ((party.votes / totalVotes) * 100).toFixed(2) : 0;
+                let badgeClass = 'loser'; if(res.isWinner) badgeClass = 'winner'; else if(res.isApparented) badgeClass = 'apparented';
+                let seatBadge = party.seats > 0 ? `<span class="seats-badge ${badgeClass}">${party.seats} Eletti</span>` : `<span class="seats-badge zero">0 Seggi</span>`;
+                let gapBadge = (party.gap !== null && party.votes >= threshold) ? 
+                    `<span class="gap-badge" style="background:#fffbeb; color:#b45309; border:1px solid #fcd34d;">Mancano ${party.gap} voti per un seggio in più</span>` : '';
+                
+                let toggleHtml = '';
+                if(party.seats > 0) {
+                    let isChecked = (highlightedPartyName === party.name) ? 'checked' : '';
+                    toggleHtml = `<div style="display:flex; align-items:center;"><span class="switch-label">Focus</span><label class="toggle-switch"><input type="checkbox" class="party-highlight-check" value="${party.name}" ${isChecked} onclick="setHighlight('${party.name}')"><span class="slider"></span></label></div>`;
+                }
+                detailsHtml += `
+                    <div class="party-item">
+                        <div class="party-info">
+                            <strong style="font-size:1.05rem;">${party.name}</strong>
+                            <div style="font-size:0.85rem; color:#64748b; margin-top:2px;">
+                                ${party.votes.toLocaleString()} voti (${perc}%) 
+                                ${party.votes < threshold ? '<span style="color:#ef4444; font-weight:600;">(Sotto soglia)</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="party-metrics">${gapBadge} ${toggleHtml} ${seatBadge}</div>
+                    </div>`;
+            });
+            let cardClass = 'loser'; if(res.isWinner) cardClass = 'winner'; else if(res.isApparented) cardClass = 'apparented';
+            container.innerHTML += `
+                <div class="card result-group ${cardClass}">
+                    <div class="result-header"><h3 style="margin:0; font-size:1.2rem;">${res.name} ${res.isWinner ? '🏆' : (res.isApparented ? '🤝' : '')}</h3><strong style="font-size:1.1rem;">${res.seatsTotal} Seggi</strong></div>
+                    ${detailsHtml}
+                </div>`;
+        });
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('results').scrollIntoView({behavior: 'smooth'});
+    }
+
+    // Save/Load
+    function saveScenario() {
+        const data = { coalitions, inputMode, totalSeats: document.getElementById('totalSeats').value, threshold: document.getElementById('threshold').value, estimatedTotal: document.getElementById('estimatedTotalVotes').value };
+        localStorage.setItem('sim_v4_1', JSON.stringify(data)); alert("Salvataggio OK");
+    }
+    function loadSavedScenario() {
+        const d = JSON.parse(localStorage.getItem('sim_v4_1')); if(!d) return alert("No data");
+        coalitions = d.coalitions; inputMode = d.inputMode;
+        document.getElementById('totalSeats').value = d.totalSeats; document.getElementById('threshold').value = d.threshold; document.getElementById('estimatedTotalVotes').value = d.estimatedTotal;
+        document.getElementById('modeVotes').classList.toggle('active', inputMode === 'votes'); document.getElementById('modePercent').classList.toggle('active', inputMode === 'percent'); document.getElementById('totalVotesContainer').style.display = inputMode === 'percent' ? 'block' : 'none';
+        renderCoalitions();
+    }
+    function copyToClipboard() { if(!textReport) return; navigator.clipboard.writeText(textReport).then(()=>alert("Copiato!")); }
+
+    resetData();
+</script>
+
+</body>
+</html>
