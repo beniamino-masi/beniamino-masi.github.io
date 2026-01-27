@@ -100,7 +100,7 @@
                 <!-- Total Votes (Hidden by default) -->
                 <div id="totalVotesContainer" style="display:none;">
                     <label class="block text-xs font-bold text-academic-600 uppercase tracking-wider mb-2">Est. Total Votes</label>
-                    <input type="number" id="estimatedTotalVotes" value="40000" oninput="recalcLiveTotals()" 
+                    <input type="number" id="estimatedTotalVotes" value="40500" oninput="recalcLiveTotals()" 
                            class="w-full px-3 py-2 border border-academic-600 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-academic-600 font-semibold bg-blue-50">
                 </div>
 
@@ -128,8 +128,8 @@
                     <i data-lucide="folder-open" class="w-4 h-4 mr-2"></i> Load
                 </button>
                 <div class="flex-grow"></div>
-                <button onclick="loadScenario('Pisa2026')" class="flex items-center px-3 py-1.5 text-sm font-medium text-academic-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-100 transition-colors">
-                    <i data-lucide="bar-chart-2" class="w-4 h-4 mr-2"></i> Load Pisa Example
+                <button onclick="loadScenario('Pisa2023')" class="flex items-center px-3 py-1.5 text-sm font-medium text-academic-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-100 transition-colors">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4 mr-2"></i> Load Pisa 2023 Results
                 </button>
                 <button onclick="resetData()" class="flex items-center px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-red-600 transition-colors">
                     Reset
@@ -337,7 +337,7 @@
                 if(res.isApparented && party.seats > 0) seatBadge = `<span class="ml-auto px-2 py-0.5 text-xs font-bold text-white bg-academic-apparent rounded-full shrink-0">${party.seats} Seats</span>`;
 
                 let gapBadge = (party.gap !== null && party.votes >= threshold) ? 
-                    `<div class="w-full mt-1 text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 text-center">Need ${party.gap} for +1</div>` : '';
+                    `<div class="w-full mt-1 text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 text-center">Need ${party.gap} votes for +1 seat</div>` : '';
                 
                 let underThreshold = party.votes < threshold 
                     ? `<span class="text-red-500 font-bold ml-1 text-xs">(Below threshold)</span>` : '';
@@ -564,7 +564,7 @@
                 res.details.sort((a,b) => b.votes - a.votes);
                 res.details.forEach(p => {
                     if(p.seats > 0) textReport += `   ✅ ${p.name}: ${p.seats} (${p.votes.toLocaleString()})\n`;
-                    else if (p.gap !== null && p.votes >= thresholdVotes) textReport += `   Need ${p.gap} for +1\n`;
+                    else if (p.gap !== null && p.votes >= thresholdVotes) textReport += `   Need ${p.gap} votes for +1 seat\n`;
                 });
                 textReport += "\n";
             });
@@ -607,12 +607,7 @@
         if (highlightedPartyName === partyName) highlightedPartyName = null;
         else highlightedPartyName = partyName;
         if(lastCalculationResult) drawHemicycle(lastCalculationResult.seatsData, lastCalculationResult.totalSeats);
-        // Do NOT re-render full results here as it resets switches. Just visually update if needed.
-        // Actually, re-rendering is the easiest way to update the switches state for now.
         if(lastCalculationResult && lastCalculationResult.output) {
-             // Re-render but we need to reconstruct the output if we didn't save it. 
-             // Ideally we save the full 'finalOutput' to 'lastCalculationResult'
-             // For now, let's just re-draw hemicycle. The switch state is handled by the click.
         }
     }
 
@@ -684,34 +679,46 @@
     function setWinner(index) { coalitions.forEach((c, i) => { c.isWinner = (i === index); if(c.isWinner) c.isApparented = false; }); renderCoalitions(); }
     function setApparented(index, isChecked) { coalitions[index].isApparented = isChecked; if(isChecked) coalitions[index].isWinner = false; renderCoalitions(); }
     function loadScenario(type) {
-        if(type === 'Pisa2026') {
+        if(type === 'Pisa2023') {
             if(inputMode === 'percent') {
                  coalitions = [
-                    { id: 1, name: "Center-Left", isWinner: true, isApparented: false, parties: [
-                        { name: "PD", value: 28.5 }, { name: "AVS", value: 8.5 }, 
-                        { name: "La Città delle Persone", value: 3.8 }, { name: "M5S", value: 3.5 }, { name: "Terzo Polo", value: 5.5 }
+                    { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, parties: [
+                        { name: "Fratelli d'Italia", value: 16.9 }, { name: "Michele Conti Sindaco", value: 14.7 }, 
+                        { name: "Lega", value: 10.4 }, { name: "Pesciatini per Pisa", value: 4.8 }, 
+                        { name: "Forza Italia - UDC - PLI", value: 3.5 }, { name: "Pisa Punto Zero", value: 1.0 }
                     ]},
-                    { id: 2, name: "Center-Right", isWinner: false, isApparented: false, parties: [
-                        { name: "FdI", value: 22.0 }, { name: "Lega", value: 10.0 }, 
-                        { name: "FI", value: 6.5 }, { name: "Civic List", value: 7.5 }
+                    { id: 2, name: "Paolo Martinelli (Centrosinistra)", isWinner: false, isApparented: false, parties: [
+                        { name: "Partito Democratico", value: 23.9 }, { name: "La Città delle Persone", value: 5.6 }, 
+                        { name: "Sinistra Unita per Pisa", value: 4.9 }, { name: "Movimento 5 Stelle", value: 3.0 },
+                        { name: "Riformisti per Pisa", value: 2.2 }
                     ]},
-                    { id: 3, name: "Left Wing", isWinner: false, isApparented: false, parties: [
-                        { name: "Una città in comune", value: 7.0 }
+                    { id: 3, name: "Ciccio Auletta (Sinistra)", isWinner: false, isApparented: false, parties: [
+                        { name: "Una città in comune", value: 5.1 }, { name: "Unione Popolare", value: 1.4 }
+                    ]},
+                     { id: 4, name: "Altri Candidati", isWinner: false, isApparented: false, parties: [
+                        { name: "Rita Mariotti (Terzo Polo)", value: 1.3 }, { name: "Alexandre Dei (Patto Civico)", value: 0.6 },
+                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 0.5 }
                     ]}
                 ];
-                document.getElementById('estimatedTotalVotes').value = 40000;
+                document.getElementById('estimatedTotalVotes').value = 40500;
             } else {
-                coalitions = [
-                    { id: 1, name: "Center-Left", isWinner: true, isApparented: false, parties: [
-                        { name: "PD", value: 11500 }, { name: "AVS", value: 3500 }, 
-                        { name: "La Città delle Persone", value: 1500 }, { name: "M5S", value: 1500 }, { name: "Terzo Polo", value: 2200 }
+                 coalitions = [
+                    { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, parties: [
+                        { name: "Fratelli d'Italia", value: 6868 }, { name: "Michele Conti Sindaco", value: 5961 }, 
+                        { name: "Lega", value: 4220 }, { name: "Pesciatini per Pisa", value: 1957 }, 
+                        { name: "Forza Italia - UDC - PLI", value: 1424 }, { name: "Pisa Punto Zero", value: 426 }
                     ]},
-                    { id: 2, name: "Center-Right", isWinner: false, isApparented: false, parties: [
-                        { name: "FdI", value: 8500 }, { name: "Lega", value: 4000 }, 
-                        { name: "FI", value: 2500 }, { name: "Civic List", value: 3000 }
+                    { id: 2, name: "Paolo Martinelli (Centrosinistra)", isWinner: false, isApparented: false, parties: [
+                        { name: "Partito Democratico", value: 9694 }, { name: "La Città delle Persone", value: 2289 }, 
+                        { name: "Sinistra Unita per Pisa", value: 1993 }, { name: "Movimento 5 Stelle", value: 1228 },
+                        { name: "Riformisti per Pisa", value: 914 }
                     ]},
-                    { id: 3, name: "Left Wing", isWinner: false, isApparented: false, parties: [
-                        { name: "Una città in comune", value: 2800 }
+                    { id: 3, name: "Ciccio Auletta (Sinistra)", isWinner: false, isApparented: false, parties: [
+                        { name: "Una città in comune", value: 2060 }, { name: "Unione Popolare", value: 589 }
+                    ]},
+                     { id: 4, name: "Altri Candidati", isWinner: false, isApparented: false, parties: [
+                        { name: "Rita Mariotti (Terzo Polo)", value: 538 }, { name: "Alexandre Dei (Patto Civico)", value: 257 },
+                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 212 }
                     ]}
                 ];
             }
@@ -732,6 +739,3 @@
 
     init();
 </script>
-
-</body>
-</html>
