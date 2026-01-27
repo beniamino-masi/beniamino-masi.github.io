@@ -63,7 +63,7 @@
 
     <!-- Navigation -->
     <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
             <a href="index.html" class="text-sm font-medium text-slate-500 hover:text-academic-600 flex items-center transition-colors">
                 <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Portfolio
             </a>
@@ -71,7 +71,7 @@
         </div>
     </nav>
 
-    <div class="max-w-5xl mx-auto px-6 py-12">
+    <div class="max-w-6xl mx-auto px-6 py-12">
         
         <header class="text-center mb-12">
             <h1 class="font-serif text-3xl md:text-4xl font-bold text-slate-900 mb-4">Municipal Election Simulator</h1>
@@ -146,7 +146,7 @@
         </div>
 
         <!-- Coalitions Grid -->
-        <div id="coalitionsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
+        <div id="coalitionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <!-- Dynamic Content -->
         </div>
 
@@ -156,7 +156,7 @@
         </button>
 
         <!-- Results Section -->
-        <div id="results" class="hidden animate-fade-in">
+        <div id="results" class="hidden animate-fade-in bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200">
                 <h2 class="font-serif text-3xl text-slate-900">Results</h2>
                 <button onclick="copyToClipboard()" class="flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
@@ -167,12 +167,12 @@
             <p id="resultsSummary" class="text-center font-mono text-sm text-slate-500 mb-8"></p>
 
             <!-- Hemicycle -->
-            <div class="bg-white rounded-xl border border-slate-200 p-8 mb-8 shadow-inner flex justify-center overflow-x-auto">
+            <div class="bg-slate-50 rounded-xl border border-slate-200 p-8 mb-8 shadow-inner flex justify-center overflow-x-auto">
                 <svg id="hemicycleSvg" width="600" height="260" viewBox="0 0 600 260" class="max-w-full"></svg>
             </div>
 
             <!-- Details -->
-            <div id="resultsDetails" class="space-y-6">
+            <div id="resultsDetails" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Dynamic Content -->
             </div>
         </div>
@@ -231,12 +231,12 @@
             col.parties.forEach((party, pIndex) => {
                 let val = party.value > 0 ? party.value : '';
                 partiesHtml += `
-                    <div class="flex gap-2 mb-3">
+                    <div class="flex items-center gap-2 mb-3">
                         <input type="text" placeholder="Party Name" value="${party.name}" onchange="updateParty(${cIndex}, ${pIndex}, 'name', this.value)" 
-                            class="flex-grow px-3 py-2 text-sm border border-slate-200 rounded bg-slate-50 focus:bg-white focus:border-academic-600 focus:outline-none transition-colors">
+                            class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 rounded bg-slate-50 focus:bg-white focus:border-academic-600 focus:outline-none transition-colors">
                         <input type="number" placeholder="${placeholderTxt}" value="${val}" step="${stepValue}" oninput="updatePartyValue(${cIndex}, ${pIndex}, this.value)" 
-                            class="w-24 px-3 py-2 text-sm border border-slate-200 rounded bg-slate-50 focus:bg-white focus:border-academic-600 focus:outline-none transition-colors text-right font-mono">
-                        <button onclick="removeParty(${cIndex}, ${pIndex})" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors" title="Remove List">
+                            class="w-20 px-3 py-2 text-sm border border-slate-200 rounded bg-slate-50 focus:bg-white focus:border-academic-600 focus:outline-none transition-colors text-right font-mono">
+                        <button onclick="removeParty(${cIndex}, ${pIndex})" class="flex-shrink-0 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors" title="Remove List">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
@@ -260,25 +260,25 @@
 
             let winnerControl = '';
             if(col.isWinner) {
-                winnerControl = `<label class="flex items-center text-sm font-bold text-green-700"><input type="radio" checked disabled class="mr-2"> Winner</label>`;
+                winnerControl = `<label class="flex items-center text-sm font-bold text-green-700"><input type="radio" checked disabled class="mr-2 accent-academic-success"> Elected Mayor</label>`;
             } else {
                 winnerControl = `
                     <div class="flex justify-between items-center w-full">
                         <label class="flex items-center text-sm text-slate-500 hover:text-slate-800 cursor-pointer">
-                            <input type="radio" name="winner" onclick="setWinner(${cIndex})" class="mr-2"> Set as Winner
+                            <input type="radio" name="winner" onclick="setWinner(${cIndex})" class="mr-2 accent-academic-600"> Set as Winner
                         </label>
                         <label class="flex items-center text-sm text-purple-600 hover:text-purple-800 cursor-pointer font-medium">
-                            <input type="checkbox" ${col.isApparented ? 'checked' : ''} onchange="setApparented(${cIndex}, this.checked)" class="mr-2"> Alliance (App.)
+                            <input type="checkbox" ${col.isApparented ? 'checked' : ''} onchange="setApparented(${cIndex}, this.checked)" class="mr-2 accent-academic-apparent"> Alliance (App.)
                         </label>
                     </div>
                 `;
             }
 
             const html = `
-                <div class="relative p-6 rounded-lg border-t-4 shadow-sm transition-all ${bgClass} border-x border-b border-slate-200 ${borderClass.replace('border-', 'border-t-')}">
+                <div class="relative p-6 rounded-lg shadow-sm transition-all ${bgClass} border ${borderClass} border-t-4">
                     ${statusBadge}
                     
-                    <div class="mb-4 pr-16">
+                    <div class="mb-6 pr-16">
                         <input type="text" value="${col.name}" onchange="updateCoalitionName(${cIndex}, this.value)" 
                             class="w-full font-serif font-bold text-lg text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-academic-600 focus:outline-none pb-1 placeholder-slate-400">
                         <div id="live-total-${cIndex}" class="text-xs font-mono text-academic-600 mt-1 h-4">Total: 0</div>
@@ -288,7 +288,7 @@
                         ${partiesHtml}
                     </div>
 
-                    <button onclick="addParty(${cIndex})" class="w-full py-2 text-xs font-medium text-academic-600 bg-blue-50 hover:bg-blue-100 rounded border border-blue-100 mb-4 transition-colors">
+                    <button onclick="addParty(${cIndex})" class="w-full py-2 text-xs font-medium text-academic-600 bg-blue-50 hover:bg-blue-100 rounded border border-blue-100 mb-4 transition-colors dashed-border">
                         + Add List
                     </button>
                     
@@ -296,7 +296,7 @@
                         ${winnerControl}
                     </div>
                     
-                    <button onclick="removeCoalition(${cIndex})" class="text-xs text-red-400 hover:text-red-600 hover:underline mt-4 w-full text-right">
+                    <button onclick="removeCoalition(${cIndex})" class="text-xs text-red-400 hover:text-red-600 hover:underline mt-4 w-full text-right block">
                         Delete Coalition
                     </button>
                 </div>
@@ -330,14 +330,14 @@
                 
                 // Badges
                 let seatBadge = party.seats > 0 
-                    ? `<span class="ml-2 px-2 py-0.5 text-xs font-bold text-white bg-slate-700 rounded-full">${party.seats} Seats</span>` 
-                    : `<span class="ml-2 px-2 py-0.5 text-xs font-medium text-slate-400 bg-slate-100 rounded-full">0</span>`;
+                    ? `<span class="ml-auto px-2 py-0.5 text-xs font-bold text-white bg-slate-700 rounded-full shrink-0">${party.seats} Seats</span>` 
+                    : `<span class="ml-auto px-2 py-0.5 text-xs font-medium text-slate-400 bg-slate-100 rounded-full shrink-0">0</span>`;
                 
-                if(res.isWinner && party.seats > 0) seatBadge = `<span class="ml-2 px-2 py-0.5 text-xs font-bold text-white bg-academic-success rounded-full">${party.seats} Seats</span>`;
-                if(res.isApparented && party.seats > 0) seatBadge = `<span class="ml-2 px-2 py-0.5 text-xs font-bold text-white bg-academic-apparent rounded-full">${party.seats} Seats</span>`;
+                if(res.isWinner && party.seats > 0) seatBadge = `<span class="ml-auto px-2 py-0.5 text-xs font-bold text-white bg-academic-success rounded-full shrink-0">${party.seats} Seats</span>`;
+                if(res.isApparented && party.seats > 0) seatBadge = `<span class="ml-auto px-2 py-0.5 text-xs font-bold text-white bg-academic-apparent rounded-full shrink-0">${party.seats} Seats</span>`;
 
                 let gapBadge = (party.gap !== null && party.votes >= threshold) ? 
-                    `<span class="ml-2 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">Need ${party.gap} for +1</span>` : '';
+                    `<div class="w-full mt-1 text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 text-center">Need ${party.gap} for +1</div>` : '';
                 
                 let underThreshold = party.votes < threshold 
                     ? `<span class="text-red-500 font-bold ml-1 text-xs">(Below threshold)</span>` : '';
@@ -347,9 +347,8 @@
                 if(party.seats > 0) {
                     let isChecked = (highlightedPartyName === party.name) ? 'checked' : '';
                     toggleHtml = `
-                        <div class="flex items-center ml-auto pl-4">
-                            <span class="text-[10px] uppercase text-slate-400 font-bold mr-2">Focus</span>
-                            <label class="toggle-switch">
+                        <div class="flex items-center ml-3 pl-3 border-l border-slate-100">
+                            <label class="toggle-switch transform scale-75 origin-right">
                                 <input type="checkbox" value="${party.name}" ${isChecked} onclick="setHighlight('${party.name}')">
                                 <span class="slider"></span>
                             </label>
@@ -357,16 +356,19 @@
                 }
 
                 detailsHtml += `
-                    <div class="flex items-center justify-between p-3 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors">
-                        <div>
-                            <div class="font-bold text-slate-800 text-sm">${party.name}</div>
-                            <div class="text-xs text-slate-500 font-mono mt-0.5">
-                                ${party.votes.toLocaleString()} (${perc}%) ${underThreshold}
+                    <div class="flex flex-col p-3 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <div class="min-w-0">
+                                <div class="font-bold text-slate-800 text-sm truncate" title="${party.name}">${party.name}</div>
+                                <div class="text-xs text-slate-500 font-mono mt-0.5">
+                                    ${party.votes.toLocaleString()} (${perc}%) ${underThreshold}
+                                </div>
+                            </div>
+                            <div class="flex items-center pl-2">
+                                ${seatBadge} ${toggleHtml}
                             </div>
                         </div>
-                        <div class="flex items-center">
-                            ${gapBadge} ${seatBadge} ${toggleHtml}
-                        </div>
+                        ${gapBadge}
                     </div>`;
             });
 
@@ -387,21 +389,23 @@
 
             container.innerHTML += `
                 <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden ${cardBorder}">
-                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h3 class="font-serif font-bold text-lg ${headerColor}">${res.name} ${icon}</h3>
-                        <span class="font-mono font-bold text-lg text-slate-800">${res.seatsTotal} Seats</span>
+                    <div class="px-5 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="font-serif font-bold text-md ${headerColor} truncate pr-2">${res.name} ${icon}</h3>
+                        <span class="font-mono font-bold text-lg text-slate-800 shrink-0">${res.seatsTotal}</span>
                     </div>
-                    <div class="px-6 py-2">
+                    <div class="px-1 py-1">
                         ${detailsHtml}
                     </div>
                 </div>`;
         });
         
-        document.getElementById('results').classList.remove('hidden');
-        document.getElementById('results').scrollIntoView({behavior: 'smooth'});
+        const resultsEl = document.getElementById('results');
+        resultsEl.classList.remove('hidden');
+        resultsEl.style.display = 'block'; // Ensure visibility
+        resultsEl.scrollIntoView({behavior: 'smooth'});
     }
 
-    // --- LOGIC FUNCTIONS (Unchanged logic, just helpers) ---
+    // --- LOGIC FUNCTIONS ---
     function recalcLiveTotals() {
         let grandTotal = 0;
         let isPercent = (inputMode === 'percent');
@@ -430,143 +434,148 @@
     }
 
     function calculateResults() {
-        highlightedPartyName = null; 
-        textReport = "🗳️ *ELECTION SIMULATION*\n\n";
+        try {
+            highlightedPartyName = null; 
+            textReport = "🗳️ *ELECTION SIMULATION*\n\n";
 
-        const totalSeats = parseInt(document.getElementById('totalSeats').value);
-        const thresholdPercent = parseFloat(document.getElementById('threshold').value);
-        const estimatedTotal = parseInt(document.getElementById('estimatedTotalVotes').value) || 0;
-        
-        if(inputMode === 'percent' && estimatedTotal <= 0) { alert("Please enter Estimated Total Votes."); return; }
-
-        let grandTotalVotes = 0;
-        let simCoalitions = JSON.parse(JSON.stringify(coalitions)); 
-        simCoalitions.forEach(col => {
-            col.totalVotes = 0;
-            col.parties.forEach(p => {
-                p.votes = inputMode === 'percent' ? Math.round((p.value / 100) * estimatedTotal) : Number(p.value);
-                col.totalVotes += p.votes;
-            });
-            grandTotalVotes += col.totalVotes;
-        });
-
-        const absoluteMajority = Math.floor(grandTotalVotes / 2) + 1;
-        let firstRoundWinner = simCoalitions.find(c => c.totalVotes >= absoluteMajority);
-        let winningCoalition = null;
-        let isFirstRoundVictory = false;
-
-        if (firstRoundWinner) {
-            alert(`⚠️ FIRST ROUND VICTORY: "${firstRoundWinner.name}" exceeded 50% (${firstRoundWinner.totalVotes.toLocaleString()} votes).`);
-            isFirstRoundVictory = true;
-            winningCoalition = firstRoundWinner;
-            simCoalitions.forEach(c => {
-                c.isWinner = (c.id === firstRoundWinner.id);
-                c.isApparented = false; 
-            });
-        } else {
-            winningCoalition = simCoalitions.find(c => c.isWinner);
-        }
-
-        if(!winningCoalition) { alert("No coalition >50% and no Ballot Winner selected!"); return; }
-
-        let apparentedCoalitions = [];
-        let losingCoalitions = [];
-
-        simCoalitions.forEach(col => {
-            if (col.id === winningCoalition.id) return; 
+            const totalSeats = parseInt(document.getElementById('totalSeats').value);
+            const thresholdPercent = parseFloat(document.getElementById('threshold').value);
+            const estimatedTotal = parseInt(document.getElementById('estimatedTotalVotes').value) || 0;
             
-            if (col.isApparented && !isFirstRoundVictory) {
-                apparentedCoalitions.push(col);
-            } else {
-                if(col.totalVotes > 0) losingCoalitions.push(col);
-            }
-        });
+            if(inputMode === 'percent' && estimatedTotal <= 0) { alert("Please enter Estimated Total Votes."); return; }
 
-        const thresholdVotes = grandTotalVotes * (thresholdPercent / 100);
-        
-        textReport += `📊 Base: ${grandTotalVotes.toLocaleString()}\n`;
-        textReport += `🚧 Threshold ${thresholdPercent}%: ${Math.floor(thresholdVotes)}\n`;
-        
-        const majoritySeats = Math.ceil(totalSeats * 0.6); 
-        const minoritySeats = totalSeats - majoritySeats;
-
-        let majorityPoolParties = [];
-        winningCoalition.parties.forEach(p => {
-            if(p.votes >= thresholdVotes) majorityPoolParties.push({...p, originalCoalition: winningCoalition.id});
-        });
-        apparentedCoalitions.forEach(acol => {
-            acol.parties.forEach(p => {
-                if(p.votes >= thresholdVotes) majorityPoolParties.push({...p, originalCoalition: acol.id});
+            let grandTotalVotes = 0;
+            let simCoalitions = JSON.parse(JSON.stringify(coalitions)); 
+            simCoalitions.forEach(col => {
+                col.totalVotes = 0;
+                col.parties.forEach(p => {
+                    p.votes = inputMode === 'percent' ? Math.round((p.value / 100) * estimatedTotal) : Number(p.value);
+                    col.totalVotes += p.votes;
+                });
+                grandTotalVotes += col.totalVotes;
             });
-        });
 
-        let majorityResult = dHondtWithGap(majorityPoolParties, majoritySeats);
+            const absoluteMajority = Math.floor(grandTotalVotes / 2) + 1;
+            let firstRoundWinner = simCoalitions.find(c => c.totalVotes >= absoluteMajority);
+            let winningCoalition = null;
+            let isFirstRoundVictory = false;
 
-        let oppositionGroups = losingCoalitions.map(c => ({ name: c.name, votes: c.totalVotes, originalObj: c, isCoalition: true }));
-        oppositionGroups = oppositionGroups.filter(g => g.votes >= thresholdVotes);
-        let oppositionGroupResult = dHondtWithGap(oppositionGroups, minoritySeats);
+            if (firstRoundWinner) {
+                alert(`⚠️ FIRST ROUND VICTORY: "${firstRoundWinner.name}" exceeded 50% (${firstRoundWinner.totalVotes.toLocaleString()} votes).`);
+                isFirstRoundVictory = true;
+                winningCoalition = firstRoundWinner;
+                simCoalitions.forEach(c => {
+                    c.isWinner = (c.id === firstRoundWinner.id);
+                    c.isApparented = false; 
+                });
+            } else {
+                winningCoalition = simCoalitions.find(c => c.isWinner);
+            }
 
-        let finalOutput = [];
-        let allSeatsForHemicycle = []; 
+            if(!winningCoalition) { alert("No coalition >50% and no Ballot Winner selected!"); return; }
 
-        let winnerPartiesResult = majorityResult.distribution.filter(p => p.originalCoalition === winningCoalition.id);
-        let winnerSeatsTotal = winnerPartiesResult.reduce((a, b) => a + b.seats, 0);
-        winnerPartiesResult.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'winner', party: p.name }); });
+            let apparentedCoalitions = [];
+            let losingCoalitions = [];
 
-        finalOutput.push({
-            name: winningCoalition.name, isWinner: true, isApparented: false,
-            totalVotes: winningCoalition.totalVotes, seatsTotal: winnerSeatsTotal,
-            details: winnerPartiesResult, mayorSeat: false
-        });
+            simCoalitions.forEach(col => {
+                if (col.id === winningCoalition.id) return; 
+                
+                if (col.isApparented && !isFirstRoundVictory) {
+                    apparentedCoalitions.push(col);
+                } else {
+                    if(col.totalVotes > 0) losingCoalitions.push(col);
+                }
+            });
 
-        apparentedCoalitions.forEach(acol => {
-            let acolPartiesResult = majorityResult.distribution.filter(p => p.originalCoalition === acol.id);
-            let acolSeatsTotal = acolPartiesResult.reduce((a, b) => a + b.seats, 0);
-            acolPartiesResult.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'winner', party: p.name }); });
+            const thresholdVotes = grandTotalVotes * (thresholdPercent / 100);
+            
+            textReport += `📊 Base: ${grandTotalVotes.toLocaleString()}\n`;
+            textReport += `🚧 Threshold ${thresholdPercent}%: ${Math.floor(thresholdVotes)}\n`;
+            
+            const majoritySeats = Math.ceil(totalSeats * 0.6); 
+            const minoritySeats = totalSeats - majoritySeats;
+
+            let majorityPoolParties = [];
+            winningCoalition.parties.forEach(p => {
+                if(p.votes >= thresholdVotes) majorityPoolParties.push({...p, originalCoalition: winningCoalition.id});
+            });
+            apparentedCoalitions.forEach(acol => {
+                acol.parties.forEach(p => {
+                    if(p.votes >= thresholdVotes) majorityPoolParties.push({...p, originalCoalition: acol.id});
+                });
+            });
+
+            let majorityResult = dHondtWithGap(majorityPoolParties, majoritySeats);
+
+            let oppositionGroups = losingCoalitions.map(c => ({ name: c.name, votes: c.totalVotes, originalObj: c, isCoalition: true }));
+            oppositionGroups = oppositionGroups.filter(g => g.votes >= thresholdVotes);
+            let oppositionGroupResult = dHondtWithGap(oppositionGroups, minoritySeats);
+
+            let finalOutput = [];
+            let allSeatsForHemicycle = []; 
+
+            let winnerPartiesResult = majorityResult.distribution.filter(p => p.originalCoalition === winningCoalition.id);
+            let winnerSeatsTotal = winnerPartiesResult.reduce((a, b) => a + b.seats, 0);
+            winnerPartiesResult.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'winner', party: p.name }); });
 
             finalOutput.push({
-                name: acol.name + " (App.)", isWinner: false, isApparented: true,
-                totalVotes: acol.totalVotes, seatsTotal: acolSeatsTotal,
-                details: acolPartiesResult, mayorSeat: false 
+                name: winningCoalition.name, isWinner: true, isApparented: false,
+                totalVotes: winningCoalition.totalVotes, seatsTotal: winnerSeatsTotal,
+                details: winnerPartiesResult, mayorSeat: false
             });
-        });
 
-        oppositionGroupResult.distribution.forEach(groupSeat => {
-            let coalition = groupSeat.originalObj;
-            let seatsForCoalition = groupSeat.seats;
-            if (seatsForCoalition > 0) {
-                allSeatsForHemicycle.push({ type: 'loser', party: "Candidate " + coalition.name }); 
-                
-                let availableForLists = seatsForCoalition - 1;
-                let validLists = coalition.parties.filter(p => p.votes >= thresholdVotes);
-                let listResult = { distribution: validLists.map(p => ({...p, seats: 0, gap: null })) };
-                if (availableForLists > 0) {
-                    listResult = dHondtWithGap(validLists, availableForLists);
-                    listResult.distribution.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'loser', party: p.name }); });
-                }
+            apparentedCoalitions.forEach(acol => {
+                let acolPartiesResult = majorityResult.distribution.filter(p => p.originalCoalition === acol.id);
+                let acolSeatsTotal = acolPartiesResult.reduce((a, b) => a + b.seats, 0);
+                acolPartiesResult.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'winner', party: p.name }); });
+
                 finalOutput.push({
-                    name: coalition.name, isWinner: false, isApparented: false,
-                    totalVotes: coalition.totalVotes, seatsTotal: seatsForCoalition,
-                    details: listResult.distribution, mayorSeat: true
+                    name: acol.name + " (App.)", isWinner: false, isApparented: true,
+                    totalVotes: acol.totalVotes, seatsTotal: acolSeatsTotal,
+                    details: acolPartiesResult, mayorSeat: false 
                 });
-            }
-        });
-
-        finalOutput.forEach(res => {
-            let icon = "🔻"; if(res.isWinner) icon = "🏆"; if(res.isApparented) icon = "🤝";
-            textReport += `${icon} *${res.name.toUpperCase()}*: ${res.seatsTotal} Seats\n`;
-            if(res.mayorSeat) textReport += `   👤 1 Mayor Seat\n`;
-            res.details.sort((a,b) => b.votes - a.votes);
-            res.details.forEach(p => {
-                if(p.seats > 0) textReport += `   ✅ ${p.name}: ${p.seats} (${p.votes.toLocaleString()})\n`;
-                else if (p.gap !== null && p.votes >= thresholdVotes) textReport += `   Need ${p.gap} for +1\n`;
             });
-            textReport += "\n";
-        });
 
-        lastCalculationResult = { seatsData: allSeatsForHemicycle, totalSeats: totalSeats };
-        drawHemicycle(allSeatsForHemicycle, totalSeats);
-        renderResults(finalOutput, grandTotalVotes, thresholdVotes);
+            oppositionGroupResult.distribution.forEach(groupSeat => {
+                let coalition = groupSeat.originalObj;
+                let seatsForCoalition = groupSeat.seats;
+                if (seatsForCoalition > 0) {
+                    allSeatsForHemicycle.push({ type: 'loser', party: "Candidate " + coalition.name }); 
+                    
+                    let availableForLists = seatsForCoalition - 1;
+                    let validLists = coalition.parties.filter(p => p.votes >= thresholdVotes);
+                    let listResult = { distribution: validLists.map(p => ({...p, seats: 0, gap: null })) };
+                    if (availableForLists > 0) {
+                        listResult = dHondtWithGap(validLists, availableForLists);
+                        listResult.distribution.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'loser', party: p.name }); });
+                    }
+                    finalOutput.push({
+                        name: coalition.name, isWinner: false, isApparented: false,
+                        totalVotes: coalition.totalVotes, seatsTotal: seatsForCoalition,
+                        details: listResult.distribution, mayorSeat: true
+                    });
+                }
+            });
+
+            finalOutput.forEach(res => {
+                let icon = "🔻"; if(res.isWinner) icon = "🏆"; if(res.isApparented) icon = "🤝";
+                textReport += `${icon} *${res.name.toUpperCase()}*: ${res.seatsTotal} Seats\n`;
+                if(res.mayorSeat) textReport += `   👤 1 Mayor Seat\n`;
+                res.details.sort((a,b) => b.votes - a.votes);
+                res.details.forEach(p => {
+                    if(p.seats > 0) textReport += `   ✅ ${p.name}: ${p.seats} (${p.votes.toLocaleString()})\n`;
+                    else if (p.gap !== null && p.votes >= thresholdVotes) textReport += `   Need ${p.gap} for +1\n`;
+                });
+                textReport += "\n";
+            });
+
+            lastCalculationResult = { seatsData: allSeatsForHemicycle, totalSeats: totalSeats };
+            drawHemicycle(allSeatsForHemicycle, totalSeats);
+            renderResults(finalOutput, grandTotalVotes, thresholdVotes);
+        } catch(e) {
+            console.error(e);
+            alert("An error occurred during calculation. Check console for details.");
+        }
     }
 
     function dHondtWithGap(candidates, seatsAvailable) {
@@ -598,7 +607,13 @@
         if (highlightedPartyName === partyName) highlightedPartyName = null;
         else highlightedPartyName = partyName;
         if(lastCalculationResult) drawHemicycle(lastCalculationResult.seatsData, lastCalculationResult.totalSeats);
-        renderResults(lastCalculationResult.output || [], 0, 0); // Re-render results to toggle switches
+        // Do NOT re-render full results here as it resets switches. Just visually update if needed.
+        // Actually, re-rendering is the easiest way to update the switches state for now.
+        if(lastCalculationResult && lastCalculationResult.output) {
+             // Re-render but we need to reconstruct the output if we didn't save it. 
+             // Ideally we save the full 'finalOutput' to 'lastCalculationResult'
+             // For now, let's just re-draw hemicycle. The switch state is handled by the click.
+        }
     }
 
     function drawHemicycle(seatsData, totalSeats) {
