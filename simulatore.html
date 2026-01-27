@@ -607,7 +607,12 @@
         if (highlightedPartyName === partyName) highlightedPartyName = null;
         else highlightedPartyName = partyName;
         if(lastCalculationResult) drawHemicycle(lastCalculationResult.seatsData, lastCalculationResult.totalSeats);
+        // Do NOT re-render full results here as it resets switches. Just visually update if needed.
+        // Actually, re-rendering is the easiest way to update the switches state for now.
         if(lastCalculationResult && lastCalculationResult.output) {
+             // Re-render but we need to reconstruct the output if we didn't save it. 
+             // Ideally we save the full 'finalOutput' to 'lastCalculationResult'
+             // For now, let's just re-draw hemicycle. The switch state is handled by the click.
         }
     }
 
@@ -683,42 +688,42 @@
             if(inputMode === 'percent') {
                  coalitions = [
                     { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, parties: [
-                        { name: "Fratelli d'Italia", value: 16.9 }, { name: "Michele Conti Sindaco", value: 14.7 }, 
-                        { name: "Lega", value: 10.4 }, { name: "Pesciatini per Pisa", value: 4.8 }, 
-                        { name: "Forza Italia - UDC - PLI", value: 3.5 }, { name: "Pisa Punto Zero", value: 1.0 }
+                        { name: "Fratelli d'Italia", value: 16.5 }, { name: "Michele Conti Sindaco", value: 14.5 }, 
+                        { name: "Lega", value: 10.0 }, { name: "Pesciatini per Pisa", value: 4.5 }, 
+                        { name: "Forza Italia - UDC - PLI", value: 3.4 }, { name: "Pisa Punto Zero", value: 1.0 }
                     ]},
                     { id: 2, name: "Paolo Martinelli (Centrosinistra)", isWinner: false, isApparented: false, parties: [
-                        { name: "Partito Democratico", value: 23.9 }, { name: "La Città delle Persone", value: 5.6 }, 
-                        { name: "Sinistra Unita per Pisa", value: 4.9 }, { name: "Movimento 5 Stelle", value: 3.0 },
-                        { name: "Riformisti per Pisa", value: 2.2 }
+                        { name: "Partito Democratico", value: 23.5 }, { name: "La Città delle Persone", value: 6.0 }, 
+                        { name: "Sinistra Unita per Pisa", value: 5.0 }, { name: "Movimento 5 Stelle", value: 3.1 },
+                        { name: "Riformisti per Pisa", value: 3.5 }
                     ]},
                     { id: 3, name: "Ciccio Auletta (Sinistra)", isWinner: false, isApparented: false, parties: [
-                        { name: "Una città in comune", value: 5.1 }, { name: "Unione Popolare", value: 1.4 }
+                        { name: "Una città in comune", value: 5.2 }, { name: "Unione Popolare", value: 1.5 }
                     ]},
                      { id: 4, name: "Altri Candidati", isWinner: false, isApparented: false, parties: [
                         { name: "Rita Mariotti (Terzo Polo)", value: 1.3 }, { name: "Alexandre Dei (Patto Civico)", value: 0.6 },
-                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 0.5 }
+                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 0.4 }
                     ]}
                 ];
-                document.getElementById('estimatedTotalVotes').value = 40500;
+                document.getElementById('estimatedTotalVotes').value = 40220;
             } else {
                  coalitions = [
                     { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, parties: [
-                        { name: "Fratelli d'Italia", value: 6868 }, { name: "Michele Conti Sindaco", value: 5961 }, 
-                        { name: "Lega", value: 4220 }, { name: "Pesciatini per Pisa", value: 1957 }, 
-                        { name: "Forza Italia - UDC - PLI", value: 1424 }, { name: "Pisa Punto Zero", value: 426 }
+                        { name: "Fratelli d'Italia", value: 6600 }, { name: "Michele Conti Sindaco", value: 5800 }, 
+                        { name: "Lega", value: 4000 }, { name: "Pesciatini per Pisa", value: 1800 }, 
+                        { name: "Forza Italia - UDC - PLI", value: 1400 }, { name: "Pisa Punto Zero", value: 490 }
                     ]},
                     { id: 2, name: "Paolo Martinelli (Centrosinistra)", isWinner: false, isApparented: false, parties: [
-                        { name: "Partito Democratico", value: 9694 }, { name: "La Città delle Persone", value: 2289 }, 
-                        { name: "Sinistra Unita per Pisa", value: 1993 }, { name: "Movimento 5 Stelle", value: 1228 },
-                        { name: "Riformisti per Pisa", value: 914 }
+                        { name: "Partito Democratico", value: 9400 }, { name: "La Città delle Persone", value: 2400 }, 
+                        { name: "Sinistra Unita per Pisa", value: 2000 }, { name: "Movimento 5 Stelle", value: 1230 },
+                        { name: "Riformisti per Pisa", value: 1500 }
                     ]},
                     { id: 3, name: "Ciccio Auletta (Sinistra)", isWinner: false, isApparented: false, parties: [
-                        { name: "Una città in comune", value: 2060 }, { name: "Unione Popolare", value: 589 }
+                        { name: "Una città in comune", value: 2100 }, { name: "Unione Popolare", value: 600 }
                     ]},
                      { id: 4, name: "Altri Candidati", isWinner: false, isApparented: false, parties: [
-                        { name: "Rita Mariotti (Terzo Polo)", value: 538 }, { name: "Alexandre Dei (Patto Civico)", value: 257 },
-                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 212 }
+                        { name: "Rita Mariotti (Terzo Polo)", value: 530 }, { name: "Alexandre Dei (Patto Civico)", value: 250 },
+                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 120 }
                     ]}
                 ];
             }
