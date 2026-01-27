@@ -1,451 +1,215 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulatore Elettorale</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Simulatore Elettorale | Dr. Beniamino Masi</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        academic: {
+                            50: '#f4f6f8',
+                            100: '#e3e8ee',
+                            600: '#003B70', // Pisa Blue
+                            900: '#1a202c',
+                            'success': '#10b981',
+                            'danger': '#ef4444',
+                            'apparent': '#8b5cf6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        :root {
-            --primary: #2563eb;       
-            --primary-dark: #1e40af;
-            --secondary: #64748b;     
-            --bg-app: #f8fafc;        
-            --surface: #ffffff;       
-            --border: #e2e8f0;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --danger: #ef4444;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --highlight: #facc15;     
-            --apparent: #8b5cf6;      
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-app);
-            color: var(--text-main);
-            margin: 0;
-            padding: 40px 20px;
-            line-height: 1.6;
-        }
-
-        .container { max-width: 1100px; margin: 0 auto; }
-
-        /* --- HEADER --- */
-        .app-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-        .app-header h1 {
-            font-weight: 700;
-            font-size: 2.2rem;
-            margin: 0;
-            color: var(--primary-dark);
-            letter-spacing: -0.02em;
-        }
-        .app-header p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin-top: 8px;
-        }
-
-        /* --- CARDS & PANELS --- */
-        .card {
-            background: var(--surface);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            border: 1px solid var(--border);
-            padding: 24px;
-            margin-bottom: 24px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        .config-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            align-items: end;
-        }
-
-        /* --- INPUTS --- */
-        label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            font-size: 1rem;
-            color: var(--text-main);
-            transition: border-color 0.2s, box-shadow 0.2s;
-            box-sizing: border-box; 
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        /* --- BUTTONS --- */
-        button {
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.2s;
-            border: none;
-            font-size: 0.95rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 12px 24px;
-            width: 100%;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 8px 16px;
-        }
-        .btn-secondary:hover {
-            background: var(--bg-app);
-            color: var(--text-main);
-            border-color: #cbd5e1;
-        }
-
-        .btn-action {
-            background: #e0f2fe;
-            color: var(--primary);
-            padding: 8px 12px;
-            width: 100%;
-            font-size: 0.85rem;
-        }
-        .btn-action:hover { background: #bae6fd; }
-
-        .btn-danger-text {
-            background: none;
-            color: var(--danger);
-            font-size: 0.85rem;
-            padding: 4px;
-            text-decoration: underline;
-            opacity: 0.8;
-        }
-        .btn-danger-text:hover { opacity: 1; }
-
-        .btn-icon-remove {
-            background: #fef2f2;
-            color: var(--danger);
-            width: 36px;
-            height: 38px;
-            padding: 0;
-            border: 1px solid #fecaca;
-        }
-        .btn-icon-remove:hover { background: #fee2e2; }
-
-        /* --- TOGGLES & SWITCHES --- */
-        .mode-switch {
-            display: flex;
-            background: var(--border);
-            border-radius: 8px;
-            padding: 4px;
-            cursor: pointer;
-        }
-        .mode-option {
-            flex: 1;
-            text-align: center;
-            padding: 6px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            transition: 0.3s;
-        }
-        .mode-option.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            font-weight: 700;
-        }
-
-        /* --- COALITIONS GRID --- */
-        .coalitions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 24px;
-            margin-bottom: 40px;
-        }
-        
-        .coalition-card {
-            border-top: 4px solid var(--border);
-            position: relative;
-        }
-        .coalition-card.is-winner { border-top-color: var(--success); }
-        .coalition-card.is-apparented { border-top-color: var(--apparent); }
-
-        .coalition-header {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--bg-app);
-        }
-        
-        /* LIVE TOTALS BADGE */
-        .live-total-badge {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--primary);
-            background: #eff6ff;
-            padding: 4px 8px;
-            border-radius: 6px;
-            margin-top: 5px;
-            font-weight: 600;
-            text-align: right;
-        }
-
-        .winner-checkbox {
-            display: inline-flex;
-            align-items: center;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--success);
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        
-        .apparent-checkbox {
-            display: inline-flex;
-            align-items: center;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--apparent);
-            cursor: pointer;
-        }
-        
-        .coalition-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .party-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        /* --- RESULTS SECTION --- */
-        #results {
-            display: none;
-            margin-top: 60px;
-            animation: fadeIn 0.5s ease-out;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .hemicycle-wrapper {
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 40px 20px;
-            text-align: center;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
-            border: 1px solid var(--border);
-            margin-bottom: 30px;
-        }
-
         .hemicycle-dot { transition: all 0.3s ease; }
         .hemicycle-dot:hover { r: 10px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); z-index: 100; cursor: help; }
-
-        .result-group {
-            border-left: 5px solid #ccc;
-            margin-bottom: 24px;
-        }
-        .result-group.winner { border-left-color: var(--success); background-color: #f0fdf4; border: 1px solid #bbf7d0; border-left-width: 5px;}
-        .result-group.loser { border-left-color: var(--danger); background-color: #fef2f2; border: 1px solid #fecaca; border-left-width: 5px;}
-        .result-group.apparented { border-left-color: var(--apparent); background-color: #f5f3ff; border: 1px solid #ddd6fe; border-left-width: 5px;}
-
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .seats-badge {
-            background: var(--text-main);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .seats-badge.winner { background: var(--success); }
-        .seats-badge.loser { background: var(--danger); }
-        .seats-badge.apparented { background: var(--apparent); }
-        .seats-badge.zero { background: var(--text-muted); opacity: 0.5; }
-
-        .party-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.03);
-        }
-        .party-item:last-child { border-bottom: none; }
-
-        /* Custom Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 36px;
-            height: 20px;
-            margin-left: 10px;
-        }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #cbd5e1;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--highlight); }
-        input:checked + .slider:before { transform: translateX(16px); }
         
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-        }
+        /* Toggle Switch */
+        .toggle-switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #003B70; }
+        input:checked + .slider:before { transform: translateX(16px); }
     </style>
 </head>
-<body>
+<body class="bg-academic-50 text-slate-700 antialiased leading-relaxed">
 
-<div class="container">
-    
-    <header class="app-header">
-        <h1>Simulatore Elezioni Comunali</h1>
-    </header>
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="text-sm font-medium text-slate-500 hover:text-academic-600 flex items-center transition-colors">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Portfolio
+            </a>
+            <span class="font-serif font-bold text-slate-800">Beniamino Masi</span>
+        </div>
+    </nav>
 
-    <div class="card">
-        <div class="config-grid">
-            <div>
-                <label>Modalità Input</label>
-                <div class="mode-switch" onclick="toggleInputMode()">
-                    <div id="modeVotes" class="mode-option active">Voti Assoluti</div>
-                    <div id="modePercent" class="mode-option">% Percentuali</div>
+    <div class="max-w-5xl mx-auto px-6 py-12">
+        
+        <header class="text-center mb-12">
+            <h1 class="font-serif text-3xl md:text-4xl font-bold text-slate-900 mb-4">Municipal Election Simulator</h1>
+            <p class="text-slate-600 max-w-2xl mx-auto">
+                A tool to simulate seat distribution in Italian municipal elections (>15k inhabitants). Configure coalitions, set thresholds, and visualize the resulting city council.
+            </p>
+        </header>
+
+        <!-- Configuration Panel -->
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-6 md:p-8 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end mb-8">
+                
+                <!-- Input Mode -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Input Mode</label>
+                    <div class="flex bg-slate-100 p-1 rounded-lg">
+                        <button id="modeVotes" onclick="setInputMode('votes')" class="flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-white bg-academic-600 shadow-sm">
+                            Votes
+                        </button>
+                        <button id="modePercent" onclick="setInputMode('percent')" class="flex-1 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-900 transition-all">
+                            %
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Total Votes (Hidden by default) -->
+                <div id="totalVotesContainer" style="display:none;">
+                    <label class="block text-xs font-bold text-academic-600 uppercase tracking-wider mb-2">Est. Total Votes</label>
+                    <input type="number" id="estimatedTotalVotes" value="40000" oninput="recalcLiveTotals()" 
+                           class="w-full px-3 py-2 border border-academic-600 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-academic-600 font-semibold bg-blue-50">
+                </div>
+
+                <!-- Seats -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Council Seats</label>
+                    <input type="number" id="totalSeats" value="32" 
+                           class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-900 focus:border-academic-600 focus:outline-none focus:ring-1 focus:ring-academic-600 transition-colors">
+                </div>
+
+                <!-- Threshold -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Threshold (%)</label>
+                    <input type="number" id="threshold" value="3" step="0.1" 
+                           class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-900 focus:border-academic-600 focus:outline-none focus:ring-1 focus:ring-academic-600 transition-colors">
                 </div>
             </div>
 
-            <div id="totalVotesContainer" style="display:none;">
-                <label style="color:var(--primary);">Totale Voti Validi (Stima)</label>
-                <input type="number" id="estimatedTotalVotes" value="40000" style="font-weight:bold; color:var(--primary);" oninput="recalcLiveTotals()">
-            </div>
-
-            <div>
-                <label>Seggi Consiglio</label>
-                <input type="number" id="totalSeats" value="32">
-            </div>
-
-            <div>
-                <label>Soglia Sbarramento (%)</label>
-                <input type="number" id="threshold" value="3" step="0.1">
+            <!-- Toolbar -->
+            <div class="flex flex-wrap gap-3 pt-6 border-t border-slate-100">
+                <button onclick="saveScenario()" class="flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
+                    <i data-lucide="save" class="w-4 h-4 mr-2"></i> Save
+                </button>
+                <button onclick="loadSavedScenario()" class="flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
+                    <i data-lucide="folder-open" class="w-4 h-4 mr-2"></i> Load
+                </button>
+                <div class="flex-grow"></div>
+                <button onclick="loadScenario('Pisa2026')" class="flex items-center px-3 py-1.5 text-sm font-medium text-academic-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-100 transition-colors">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4 mr-2"></i> Load Pisa Example
+                </button>
+                <button onclick="resetData()" class="flex items-center px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-red-600 transition-colors">
+                    Reset
+                </button>
             </div>
         </div>
 
-        <div class="toolbar">
-            <button onclick="saveScenario()" class="btn-secondary">💾 Salva</button>
-            <button onclick="loadSavedScenario()" class="btn-secondary">📂 Carica</button>
-            <div style="flex-grow:1;"></div>
-            <button onclick="loadScenario('Pisa2026')" class="btn-secondary" style="border-color:var(--primary); color:var(--primary);">
-                📊 Carica simulazione esempio Pisa
+        <!-- Coalitions Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-serif text-xl text-slate-900">Coalitions & Lists</h3>
+            <button onclick="addCoalition()" class="flex items-center px-4 py-2 bg-academic-600 text-white rounded-lg hover:bg-academic-900 transition-colors shadow-sm text-sm font-medium">
+                <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add Coalition
             </button>
-            <button onclick="resetData()" class="btn-secondary">Reset</button>
-        </div>
-    </div>
-
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3 style="margin:0;">Coalizioni e Liste</h3>
-        <button onclick="addCoalition()" class="btn-secondary" style="background:var(--primary); color:white; border:none;">+ Nuova Coalizione</button>
-    </div>
-
-    <div id="coalitionsContainer" class="coalitions-grid"></div>
-
-    <button class="btn-primary" onclick="calculateResults()">
-        Calcola Distribuzione
-    </button>
-
-    <div id="results">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0;">Risultati Simulazione</h2>
-            <button onclick="copyToClipboard()" class="btn-secondary">📋 Copia Report</button>
         </div>
 
-        <div id="resultsSummary" style="margin-bottom:20px; font-weight:600; color:var(--text-muted); text-align:center;"></div>
-
-        <div class="hemicycle-wrapper">
-            <svg id="hemicycleSvg" width="600" height="260" viewBox="0 0 600 260" style="display:inline-block; max-width:100%;"></svg>
+        <!-- Coalitions Grid -->
+        <div id="coalitionsContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
+            <!-- Dynamic Content -->
         </div>
 
-        <div id="resultsDetails"></div>
-    </div>
+        <!-- Calculate Button -->
+        <button class="w-full py-4 bg-academic-600 text-white text-lg font-serif font-bold rounded-lg shadow-md hover:bg-academic-900 hover:shadow-lg transition-all transform hover:-translate-y-0.5 mb-12 flex items-center justify-center" onclick="calculateResults()">
+            <i data-lucide="calculator" class="w-6 h-6 mr-3"></i> Calculate Distribution
+        </button>
 
-</div>
+        <!-- Results Section -->
+        <div id="results" class="hidden animate-fade-in">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200">
+                <h2 class="font-serif text-3xl text-slate-900">Results</h2>
+                <button onclick="copyToClipboard()" class="flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
+                    <i data-lucide="clipboard" class="w-4 h-4 mr-2"></i> Copy Report
+                </button>
+            </div>
+
+            <p id="resultsSummary" class="text-center font-mono text-sm text-slate-500 mb-8"></p>
+
+            <!-- Hemicycle -->
+            <div class="bg-white rounded-xl border border-slate-200 p-8 mb-8 shadow-inner flex justify-center overflow-x-auto">
+                <svg id="hemicycleSvg" width="600" height="260" viewBox="0 0 600 260" class="max-w-full"></svg>
+            </div>
+
+            <!-- Details -->
+            <div id="resultsDetails" class="space-y-6">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+
+    </div>
 
 <script>
+    // --- STATE ---
     let coalitions = [];
     let inputMode = 'votes'; 
     let lastCalculationResult = null; 
     let highlightedPartyName = null; 
     let textReport = "";
 
-    function toggleInputMode() {
-        inputMode = inputMode === 'votes' ? 'percent' : 'votes';
-        document.getElementById('modeVotes').classList.toggle('active', inputMode === 'votes');
-        document.getElementById('modePercent').classList.toggle('active', inputMode === 'percent');
-        document.getElementById('totalVotesContainer').style.display = inputMode === 'percent' ? 'block' : 'none';
-        renderCoalitions(); 
+    // --- INITIALIZATION ---
+    function init() {
+        lucide.createIcons();
+        resetData();
+    }
+
+    // --- UI LOGIC ---
+    function setInputMode(mode) {
+        inputMode = mode;
+        const btnVotes = document.getElementById('modeVotes');
+        const btnPercent = document.getElementById('modePercent');
+        const totalContainer = document.getElementById('totalVotesContainer');
+
+        if (mode === 'votes') {
+            btnVotes.className = "flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-white bg-academic-600 shadow-sm";
+            btnPercent.className = "flex-1 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-900 transition-all";
+            totalContainer.style.display = 'none';
+        } else {
+            btnPercent.className = "flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-white bg-academic-600 shadow-sm";
+            btnVotes.className = "flex-1 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-900 transition-all";
+            totalContainer.style.display = 'block';
+        }
+        renderCoalitions();
     }
 
     function resetData() {
@@ -455,14 +219,196 @@
         document.getElementById('results').style.display = 'none';
     }
 
-    // --- LIVE TOTALS CALCULATION ---
+    // --- RENDERERS ---
+    function renderCoalitions() {
+        const container = document.getElementById('coalitionsContainer');
+        container.innerHTML = '';
+        const placeholderTxt = inputMode === 'percent' ? '%' : 'Votes';
+        const stepValue = inputMode === 'percent' ? '0.1' : '1';
+
+        coalitions.forEach((col, cIndex) => {
+            let partiesHtml = '';
+            col.parties.forEach((party, pIndex) => {
+                let val = party.value > 0 ? party.value : '';
+                partiesHtml += `
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" placeholder="Party Name" value="${party.name}" onchange="updateParty(${cIndex}, ${pIndex}, 'name', this.value)" 
+                            class="flex-grow px-3 py-2 text-sm border border-slate-200 rounded bg-slate-50 focus:bg-white focus:border-academic-600 focus:outline-none transition-colors">
+                        <input type="number" placeholder="${placeholderTxt}" value="${val}" step="${stepValue}" oninput="updatePartyValue(${cIndex}, ${pIndex}, this.value)" 
+                            class="w-24 px-3 py-2 text-sm border border-slate-200 rounded bg-slate-50 focus:bg-white focus:border-academic-600 focus:outline-none transition-colors text-right font-mono">
+                        <button onclick="removeParty(${cIndex}, ${pIndex})" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors" title="Remove List">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            // Status Styling
+            let borderClass = 'border-slate-200';
+            let bgClass = 'bg-white';
+            let statusBadge = '';
+            
+            if(col.isWinner) {
+                borderClass = 'border-academic-success';
+                bgClass = 'bg-green-50/30';
+                statusBadge = `<span class="absolute top-4 right-4 text-xs font-bold text-green-700 bg-green-100 px-2 py-1 rounded">WINNER</span>`;
+            } else if(col.isApparented) {
+                borderClass = 'border-academic-apparent';
+                bgClass = 'bg-purple-50/30';
+                statusBadge = `<span class="absolute top-4 right-4 text-xs font-bold text-purple-700 bg-purple-100 px-2 py-1 rounded">ALLIED</span>`;
+            }
+
+            let winnerControl = '';
+            if(col.isWinner) {
+                winnerControl = `<label class="flex items-center text-sm font-bold text-green-700"><input type="radio" checked disabled class="mr-2"> Winner</label>`;
+            } else {
+                winnerControl = `
+                    <div class="flex justify-between items-center w-full">
+                        <label class="flex items-center text-sm text-slate-500 hover:text-slate-800 cursor-pointer">
+                            <input type="radio" name="winner" onclick="setWinner(${cIndex})" class="mr-2"> Set as Winner
+                        </label>
+                        <label class="flex items-center text-sm text-purple-600 hover:text-purple-800 cursor-pointer font-medium">
+                            <input type="checkbox" ${col.isApparented ? 'checked' : ''} onchange="setApparented(${cIndex}, this.checked)" class="mr-2"> Alliance (App.)
+                        </label>
+                    </div>
+                `;
+            }
+
+            const html = `
+                <div class="relative p-6 rounded-lg border-t-4 shadow-sm transition-all ${bgClass} border-x border-b border-slate-200 ${borderClass.replace('border-', 'border-t-')}">
+                    ${statusBadge}
+                    
+                    <div class="mb-4 pr-16">
+                        <input type="text" value="${col.name}" onchange="updateCoalitionName(${cIndex}, this.value)" 
+                            class="w-full font-serif font-bold text-lg text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-academic-600 focus:outline-none pb-1 placeholder-slate-400">
+                        <div id="live-total-${cIndex}" class="text-xs font-mono text-academic-600 mt-1 h-4">Total: 0</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        ${partiesHtml}
+                    </div>
+
+                    <button onclick="addParty(${cIndex})" class="w-full py-2 text-xs font-medium text-academic-600 bg-blue-50 hover:bg-blue-100 rounded border border-blue-100 mb-4 transition-colors">
+                        + Add List
+                    </button>
+                    
+                    <div class="pt-4 border-t border-slate-100 flex flex-wrap gap-2">
+                        ${winnerControl}
+                    </div>
+                    
+                    <button onclick="removeCoalition(${cIndex})" class="text-xs text-red-400 hover:text-red-600 hover:underline mt-4 w-full text-right">
+                        Delete Coalition
+                    </button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+        
+        lucide.createIcons();
+        recalcLiveTotals();
+    }
+
+    function renderResults(results, totalVotes, threshold) {
+        document.getElementById('resultsSummary').innerHTML = `Base: ${totalVotes.toLocaleString()} votes • Threshold: ${Math.floor(threshold)}`;
+        const container = document.getElementById('resultsDetails');
+        container.innerHTML = '';
+        
+        results.forEach(res => {
+            let detailsHtml = '';
+            
+            // Mayor Seat Indicator
+            if(res.mayorSeat) {
+                detailsHtml += `
+                    <div class="flex items-center p-3 mb-2 bg-slate-50 border border-slate-200 rounded text-slate-700 text-sm">
+                        <span class="mr-2 text-lg">👤</span> <strong>1 Mayor Seat (Candidate)</strong>
+                    </div>`;
+            }
+
+            res.details.sort((a,b) => b.votes - a.votes);
+            res.details.forEach(party => {
+                let perc = totalVotes > 0 ? ((party.votes / totalVotes) * 100).toFixed(2) : 0;
+                
+                // Badges
+                let seatBadge = party.seats > 0 
+                    ? `<span class="ml-2 px-2 py-0.5 text-xs font-bold text-white bg-slate-700 rounded-full">${party.seats} Seats</span>` 
+                    : `<span class="ml-2 px-2 py-0.5 text-xs font-medium text-slate-400 bg-slate-100 rounded-full">0</span>`;
+                
+                if(res.isWinner && party.seats > 0) seatBadge = `<span class="ml-2 px-2 py-0.5 text-xs font-bold text-white bg-academic-success rounded-full">${party.seats} Seats</span>`;
+                if(res.isApparented && party.seats > 0) seatBadge = `<span class="ml-2 px-2 py-0.5 text-xs font-bold text-white bg-academic-apparent rounded-full">${party.seats} Seats</span>`;
+
+                let gapBadge = (party.gap !== null && party.votes >= threshold) ? 
+                    `<span class="ml-2 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">Need ${party.gap} for +1</span>` : '';
+                
+                let underThreshold = party.votes < threshold 
+                    ? `<span class="text-red-500 font-bold ml-1 text-xs">(Below threshold)</span>` : '';
+
+                // Focus Toggle
+                let toggleHtml = '';
+                if(party.seats > 0) {
+                    let isChecked = (highlightedPartyName === party.name) ? 'checked' : '';
+                    toggleHtml = `
+                        <div class="flex items-center ml-auto pl-4">
+                            <span class="text-[10px] uppercase text-slate-400 font-bold mr-2">Focus</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" value="${party.name}" ${isChecked} onclick="setHighlight('${party.name}')">
+                                <span class="slider"></span>
+                            </label>
+                        </div>`;
+                }
+
+                detailsHtml += `
+                    <div class="flex items-center justify-between p-3 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors">
+                        <div>
+                            <div class="font-bold text-slate-800 text-sm">${party.name}</div>
+                            <div class="text-xs text-slate-500 font-mono mt-0.5">
+                                ${party.votes.toLocaleString()} (${perc}%) ${underThreshold}
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            ${gapBadge} ${seatBadge} ${toggleHtml}
+                        </div>
+                    </div>`;
+            });
+
+            // Card Style based on status
+            let headerColor = 'text-slate-700';
+            let cardBorder = 'border-l-4 border-slate-300';
+            let icon = '';
+            
+            if(res.isWinner) {
+                headerColor = 'text-green-700';
+                cardBorder = 'border-l-4 border-academic-success';
+                icon = '🏆';
+            } else if(res.isApparented) {
+                headerColor = 'text-purple-700';
+                cardBorder = 'border-l-4 border-academic-apparent';
+                icon = '🤝';
+            }
+
+            container.innerHTML += `
+                <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden ${cardBorder}">
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="font-serif font-bold text-lg ${headerColor}">${res.name} ${icon}</h3>
+                        <span class="font-mono font-bold text-lg text-slate-800">${res.seatsTotal} Seats</span>
+                    </div>
+                    <div class="px-6 py-2">
+                        ${detailsHtml}
+                    </div>
+                </div>`;
+        });
+        
+        document.getElementById('results').classList.remove('hidden');
+        document.getElementById('results').scrollIntoView({behavior: 'smooth'});
+    }
+
+    // --- LOGIC FUNCTIONS (Unchanged logic, just helpers) ---
     function recalcLiveTotals() {
         let grandTotal = 0;
         let isPercent = (inputMode === 'percent');
         
         coalitions.forEach(col => {
             col.tempSum = 0;
-            col.parties.forEach(p => { col.tempSum += p.value; });
+            col.parties.forEach(p => { col.tempSum += Number(p.value); });
             grandTotal += col.tempSum;
         });
 
@@ -472,166 +418,33 @@
         coalitions.forEach((col, index) => {
             let el = document.getElementById(`live-total-${index}`);
             if(el) {
-                let suffix = isPercent ? '%' : ' voti';
+                let suffix = isPercent ? '%' : ' votes';
                 let percentVal = 0;
                 
                 if (isPercent) percentVal = col.tempSum;
                 else percentVal = (col.tempSum / baseForPercent) * 100;
                 
-                el.innerHTML = `Totale: ${col.tempSum.toLocaleString()}${suffix} <span style="font-weight:400; color:#64748b; margin-left:5px;">(${percentVal.toFixed(1)}%)</span>`;
+                el.innerHTML = `Total: <span class="font-bold">${col.tempSum.toLocaleString()}${suffix}</span> <span class="text-slate-400 font-normal">(${percentVal.toFixed(1)}%)</span>`;
             }
         });
     }
 
-    // --- LOAD SCENARIO (FIXED) ---
-    function loadScenario(type) {
-        if(type === 'Pisa2026') {
-            if(inputMode === 'percent') {
-                 coalitions = [
-                    { id: 1, name: "Centrosinistra", isWinner: true, isApparented: false, parties: [
-                        { name: "PD", value: 28.5 }, { name: "AVS", value: 8.5 }, 
-                        { name: "La Città delle Persone", value: 3.8 }, { name: "M5S", value: 3.5 }, { name: "Terzo Polo", value: 5.5 }
-                    ]},
-                    { id: 2, name: "Centrodestra", isWinner: false, isApparented: false, parties: [
-                        { name: "FdI", value: 22.0 }, { name: "Lega", value: 10.0 }, 
-                        { name: "FI", value: 6.5 }, { name: "Civica Sindaco", value: 7.5 }
-                    ]},
-                    { id: 3, name: "Ucic-PRC", isWinner: false, isApparented: false, parties: [
-                        { name: "Una città in comune", value: 7.0 }
-                    ]}
-                ];
-                document.getElementById('estimatedTotalVotes').value = 40000;
-            } else {
-                coalitions = [
-                    { id: 1, name: "Centrosinistra", isWinner: true, isApparented: false, parties: [
-                        { name: "PD", value: 11500 }, { name: "AVS", value: 3500 }, 
-                        { name: "La Città delle Persone", value: 1500 }, { name: "M5S", value: 1500 }, { name: "Terzo Polo", value: 2200 }
-                    ]},
-                    { id: 2, name: "Centrodestra", isWinner: false, isApparented: false, parties: [
-                        { name: "FdI", value: 8500 }, { name: "Lega", value: 4000 }, 
-                        { name: "FI", value: 2500 }, { name: "Civica Sindaco", value: 3000 }
-                    ]},
-                    { id: 3, name: "Ucic-PRC", isWinner: false, isApparented: false, parties: [
-                        { name: "Una città in comune", value: 2800 }
-                    ]}
-                ];
-            }
-            renderCoalitions();
-        }
-    }
-
-    function renderCoalitions() {
-        const container = document.getElementById('coalitionsContainer');
-        container.innerHTML = '';
-        const placeholderTxt = inputMode === 'percent' ? '%' : 'Voti';
-        const stepValue = inputMode === 'percent' ? '0.1' : '1';
-
-        coalitions.forEach((col, cIndex) => {
-            let partiesHtml = '';
-            col.parties.forEach((party, pIndex) => {
-                let val = party.value > 0 ? party.value : '';
-                partiesHtml += `
-                    <div class="party-row">
-                        <input type="text" placeholder="Nome Lista" value="${party.name}" onchange="updateParty(${cIndex}, ${pIndex}, 'name', this.value)">
-                        <input type="number" placeholder="${placeholderTxt}" value="${val}" step="${stepValue}" oninput="updatePartyValue(${cIndex}, ${pIndex}, this.value)">
-                        <button class="btn-icon-remove" onclick="removeParty(${cIndex}, ${pIndex})" title="Rimuovi Lista">✕</button>
-                    </div>
-                `;
-            });
-
-            let borderClass = '';
-            if(col.isWinner) borderClass = 'is-winner';
-            else if(col.isApparented) borderClass = 'is-apparented';
-
-            let optionsHtml = '';
-            if(col.isWinner) {
-                optionsHtml = `<label class="winner-checkbox"><input type="radio" name="winner" checked disabled> 🏆 Vincente</label>`;
-            } else {
-                optionsHtml = `
-                    <div class="coalition-options">
-                        <label class="winner-checkbox" style="color:#64748b; font-weight:normal;">
-                            <input type="radio" name="winner" onclick="setWinner(${cIndex})"> Vince
-                        </label>
-                        <label class="apparent-checkbox">
-                            <input type="checkbox" ${col.isApparented ? 'checked' : ''} onchange="setApparented(${cIndex}, this.checked)"> Apparentamento
-                        </label>
-                    </div>
-                `;
-            }
-
-            const html = `
-                <div class="card coalition-card ${borderClass}">
-                    <div class="coalition-header">
-                        <input type="text" value="${col.name}" onchange="updateCoalitionName(${cIndex}, this.value)" style="font-weight:700; border:none; border-bottom:1px solid #e2e8f0; width:55%; padding-left:0;">
-                        <div id="live-total-${cIndex}" class="live-total-badge">Totale: 0</div>
-                    </div>
-                    ${partiesHtml}
-                    <button class="btn-action" onclick="addParty(${cIndex})">+ Aggiungi Lista</button>
-                    ${optionsHtml}
-                    <div style="margin-top:15px; text-align:right;">
-                        <button class="btn-danger-text" onclick="removeCoalition(${cIndex})">Elimina Coalizione</button>
-                    </div>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', html);
-        });
-        recalcLiveTotals();
-    }
-
-    function updateParty(cIndex, pIndex, field, value) {
-        if(field === 'name') coalitions[cIndex].parties[pIndex].name = value;
-    }
-    
-    function updatePartyValue(cIndex, pIndex, value) {
-        let parsed = parseFloat(value) || 0;
-        coalitions[cIndex].parties[pIndex].value = parsed;
-        recalcLiveTotals();
-    }
-
-    function updateCoalitionName(cIndex, value) { coalitions[cIndex].name = value; }
-    
-    function addParty(cIndex) { 
-        let nextNum = coalitions[cIndex].parties.length + 1;
-        coalitions[cIndex].parties.push({ name: "Lista " + nextNum, value: 0 }); 
-        renderCoalitions(); 
-    }
-    
-    function removeParty(cIndex, pIndex) { coalitions[cIndex].parties.splice(pIndex, 1); renderCoalitions(); }
-    
-    function addCoalition() { 
-        let nextNum = coalitions.length + 1;
-        coalitions.push({ id: Date.now(), name: "Coalizione " + nextNum, isWinner: false, isApparented: false, parties: [{ name: "Lista 1", value: 0 }] }); 
-        renderCoalitions(); 
-    }
-    
-    function removeCoalition(index) { if(confirm("Eliminare questa coalizione?")) { coalitions.splice(index, 1); renderCoalitions(); }}
-    function setWinner(index) { 
-        coalitions.forEach((c, i) => { c.isWinner = (i === index); if(c.isWinner) c.isApparented = false; }); 
-        renderCoalitions(); 
-    }
-    function setApparented(index, isChecked) {
-        coalitions[index].isApparented = isChecked;
-        if(isChecked) coalitions[index].isWinner = false;
-        renderCoalitions();
-    }
-
-    // --- CALCOLO CORE CON CHECK 50% ---
     function calculateResults() {
         highlightedPartyName = null; 
-        textReport = "🗳️ *SIMULAZIONE ELETTORALE*\n\n";
+        textReport = "🗳️ *ELECTION SIMULATION*\n\n";
 
         const totalSeats = parseInt(document.getElementById('totalSeats').value);
         const thresholdPercent = parseFloat(document.getElementById('threshold').value);
         const estimatedTotal = parseInt(document.getElementById('estimatedTotalVotes').value) || 0;
         
-        if(inputMode === 'percent' && estimatedTotal <= 0) { alert("Inserisci Totale Voti Stimati."); return; }
+        if(inputMode === 'percent' && estimatedTotal <= 0) { alert("Please enter Estimated Total Votes."); return; }
 
         let grandTotalVotes = 0;
         let simCoalitions = JSON.parse(JSON.stringify(coalitions)); 
         simCoalitions.forEach(col => {
             col.totalVotes = 0;
             col.parties.forEach(p => {
-                p.votes = inputMode === 'percent' ? Math.round((p.value / 100) * estimatedTotal) : p.value;
+                p.votes = inputMode === 'percent' ? Math.round((p.value / 100) * estimatedTotal) : Number(p.value);
                 col.totalVotes += p.votes;
             });
             grandTotalVotes += col.totalVotes;
@@ -643,7 +456,7 @@
         let isFirstRoundVictory = false;
 
         if (firstRoundWinner) {
-            alert(`⚠️ ATTENZIONE: La coalizione "${firstRoundWinner.name}" ha superato il 50% (${firstRoundWinner.totalVotes.toLocaleString()} voti).\nVittoria al Primo Turno!`);
+            alert(`⚠️ FIRST ROUND VICTORY: "${firstRoundWinner.name}" exceeded 50% (${firstRoundWinner.totalVotes.toLocaleString()} votes).`);
             isFirstRoundVictory = true;
             winningCoalition = firstRoundWinner;
             simCoalitions.forEach(c => {
@@ -654,7 +467,7 @@
             winningCoalition = simCoalitions.find(c => c.isWinner);
         }
 
-        if(!winningCoalition) { alert("Nessuna coalizione sopra il 50% e nessun vincitore ballottaggio selezionato!"); return; }
+        if(!winningCoalition) { alert("No coalition >50% and no Ballot Winner selected!"); return; }
 
         let apparentedCoalitions = [];
         let losingCoalitions = [];
@@ -671,11 +484,9 @@
 
         const thresholdVotes = grandTotalVotes * (thresholdPercent / 100);
         
-        textReport += `📊 Base Calcolo: ${grandTotalVotes.toLocaleString()}\n`;
-        textReport += `🚧 Soglia ${thresholdPercent}%: ${Math.floor(thresholdVotes)}\n`;
-        if(isFirstRoundVictory) textReport += `🚨 VITTORIA AL PRIMO TURNO\n\n`;
-        else textReport += `⚔️ BALLOTTAGGIO\n\n`;
-
+        textReport += `📊 Base: ${grandTotalVotes.toLocaleString()}\n`;
+        textReport += `🚧 Threshold ${thresholdPercent}%: ${Math.floor(thresholdVotes)}\n`;
+        
         const majoritySeats = Math.ceil(totalSeats * 0.6); 
         const minoritySeats = totalSeats - majoritySeats;
 
@@ -724,7 +535,7 @@
             let coalition = groupSeat.originalObj;
             let seatsForCoalition = groupSeat.seats;
             if (seatsForCoalition > 0) {
-                allSeatsForHemicycle.push({ type: 'loser', party: "Candidato Sindaco " + coalition.name }); 
+                allSeatsForHemicycle.push({ type: 'loser', party: "Candidate " + coalition.name }); 
                 
                 let availableForLists = seatsForCoalition - 1;
                 let validLists = coalition.parties.filter(p => p.votes >= thresholdVotes);
@@ -742,15 +553,13 @@
         });
 
         finalOutput.forEach(res => {
-            let icon = "🔻";
-            if(res.isWinner) icon = "🏆";
-            if(res.isApparented) icon = "🤝";
-            textReport += `${icon} *${res.name.toUpperCase()}*: ${res.seatsTotal} Seggi\n`;
-            if(res.mayorSeat) textReport += `   👤 1 Seggio Sindaco\n`;
+            let icon = "🔻"; if(res.isWinner) icon = "🏆"; if(res.isApparented) icon = "🤝";
+            textReport += `${icon} *${res.name.toUpperCase()}*: ${res.seatsTotal} Seats\n`;
+            if(res.mayorSeat) textReport += `   👤 1 Mayor Seat\n`;
             res.details.sort((a,b) => b.votes - a.votes);
             res.details.forEach(p => {
                 if(p.seats > 0) textReport += `   ✅ ${p.name}: ${p.seats} (${p.votes.toLocaleString()})\n`;
-                else if (p.gap !== null && p.votes >= thresholdVotes) textReport += `   Mancano ${p.gap} voti per un seggio in più\n`;
+                else if (p.gap !== null && p.votes >= thresholdVotes) textReport += `   Need ${p.gap} for +1\n`;
             });
             textReport += "\n";
         });
@@ -760,7 +569,6 @@
         renderResults(finalOutput, grandTotalVotes, thresholdVotes);
     }
 
-    // --- UTILS ---
     function dHondtWithGap(candidates, seatsAvailable) {
         if(seatsAvailable === 0) return { distribution: candidates, cutoff: 0 };
         let distribution = candidates.map(c => ({ ...c, seats: 0, nextDivisor: 1, gap: null }));
@@ -790,8 +598,7 @@
         if (highlightedPartyName === partyName) highlightedPartyName = null;
         else highlightedPartyName = partyName;
         if(lastCalculationResult) drawHemicycle(lastCalculationResult.seatsData, lastCalculationResult.totalSeats);
-        const allChecks = document.querySelectorAll('.party-highlight-check');
-        allChecks.forEach(chk => { chk.checked = (chk.value === highlightedPartyName); });
+        renderResults(lastCalculationResult.output || [], 0, 0); // Re-render results to toggle switches
     }
 
     function drawHemicycle(seatsData, totalSeats) {
@@ -836,7 +643,7 @@
                 if (highlightedPartyName && seatInfo.party === highlightedPartyName) finalColor = '#facc15'; 
                 else {
                     finalColor = (seatInfo.type === 'winner') ? '#10b981' : '#ef4444';
-                    if(seatInfo.party && seatInfo.party.includes("Candidato Sindaco") && !highlightedPartyName) finalColor = '#b91c1c';
+                    if(seatInfo.party && seatInfo.party.includes("Candidate") && !highlightedPartyName) finalColor = '#b91c1c';
                 }
                 let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                 circle.setAttribute("cx", x); circle.setAttribute("cy", y); circle.setAttribute("r", 7);
@@ -851,63 +658,64 @@
         }
     }
 
-    function renderResults(results, totalVotes, threshold) {
-        document.getElementById('resultsSummary').innerHTML = `Base Calcolo: ${totalVotes.toLocaleString()} voti • Soglia: ${Math.floor(threshold)}`;
-        const container = document.getElementById('resultsDetails');
-        container.innerHTML = '';
-        results.forEach(res => {
-            let detailsHtml = res.mayorSeat ? `<div class="mayor-seat"><span>👤</span> <strong>1 Seggio Sindaco</strong></div>` : '';
-            res.details.sort((a,b) => b.votes - a.votes);
-            res.details.forEach(party => {
-                let perc = totalVotes > 0 ? ((party.votes / totalVotes) * 100).toFixed(2) : 0;
-                let badgeClass = 'loser'; if(res.isWinner) badgeClass = 'winner'; else if(res.isApparented) badgeClass = 'apparented';
-                let seatBadge = party.seats > 0 ? `<span class="seats-badge ${badgeClass}">${party.seats} Eletti</span>` : `<span class="seats-badge zero">0 Seggi</span>`;
-                let gapBadge = (party.gap !== null && party.votes >= threshold) ? 
-                    `<span class="gap-badge" style="background:#fffbeb; color:#b45309; border:1px solid #fcd34d;">Mancano ${party.gap} voti per un seggio in più</span>` : '';
-                
-                let toggleHtml = '';
-                if(party.seats > 0) {
-                    let isChecked = (highlightedPartyName === party.name) ? 'checked' : '';
-                    toggleHtml = `<div style="display:flex; align-items:center;"><span class="switch-label">Focus</span><label class="toggle-switch"><input type="checkbox" class="party-highlight-check" value="${party.name}" ${isChecked} onclick="setHighlight('${party.name}')"><span class="slider"></span></label></div>`;
-                }
-                detailsHtml += `
-                    <div class="party-item">
-                        <div class="party-info">
-                            <strong style="font-size:1.05rem;">${party.name}</strong>
-                            <div style="font-size:0.85rem; color:#64748b; margin-top:2px;">
-                                ${party.votes.toLocaleString()} voti (${perc}%) 
-                                ${party.votes < threshold ? '<span style="color:#ef4444; font-weight:600;">(Sotto soglia)</span>' : ''}
-                            </div>
-                        </div>
-                        <div class="party-metrics">${gapBadge} ${toggleHtml} ${seatBadge}</div>
-                    </div>`;
-            });
-            let cardClass = 'loser'; if(res.isWinner) cardClass = 'winner'; else if(res.isApparented) cardClass = 'apparented';
-            container.innerHTML += `
-                <div class="card result-group ${cardClass}">
-                    <div class="result-header"><h3 style="margin:0; font-size:1.2rem;">${res.name} ${res.isWinner ? '🏆' : (res.isApparented ? '🤝' : '')}</h3><strong style="font-size:1.1rem;">${res.seatsTotal} Seggi</strong></div>
-                    ${detailsHtml}
-                </div>`;
-        });
-        document.getElementById('results').style.display = 'block';
-        document.getElementById('results').scrollIntoView({behavior: 'smooth'});
+    // --- CRUD WRAPPERS ---
+    function updateParty(cIndex, pIndex, field, value) { if(field === 'name') coalitions[cIndex].parties[pIndex].name = value; }
+    function updatePartyValue(cIndex, pIndex, value) { coalitions[cIndex].parties[pIndex].value = value; recalcLiveTotals(); }
+    function updateCoalitionName(cIndex, value) { coalitions[cIndex].name = value; }
+    function addParty(cIndex) { coalitions[cIndex].parties.push({ name: "List " + (coalitions[cIndex].parties.length + 1), value: 0 }); renderCoalitions(); }
+    function removeParty(cIndex, pIndex) { coalitions[cIndex].parties.splice(pIndex, 1); renderCoalitions(); }
+    function addCoalition() { coalitions.push({ id: Date.now(), name: "Coalition " + (coalitions.length + 1), isWinner: false, isApparented: false, parties: [{ name: "List 1", value: 0 }] }); renderCoalitions(); }
+    function removeCoalition(index) { if(confirm("Delete this coalition?")) { coalitions.splice(index, 1); renderCoalitions(); }}
+    function setWinner(index) { coalitions.forEach((c, i) => { c.isWinner = (i === index); if(c.isWinner) c.isApparented = false; }); renderCoalitions(); }
+    function setApparented(index, isChecked) { coalitions[index].isApparented = isChecked; if(isChecked) coalitions[index].isWinner = false; renderCoalitions(); }
+    function loadScenario(type) {
+        if(type === 'Pisa2026') {
+            if(inputMode === 'percent') {
+                 coalitions = [
+                    { id: 1, name: "Center-Left", isWinner: true, isApparented: false, parties: [
+                        { name: "PD", value: 28.5 }, { name: "AVS", value: 8.5 }, 
+                        { name: "La Città delle Persone", value: 3.8 }, { name: "M5S", value: 3.5 }, { name: "Terzo Polo", value: 5.5 }
+                    ]},
+                    { id: 2, name: "Center-Right", isWinner: false, isApparented: false, parties: [
+                        { name: "FdI", value: 22.0 }, { name: "Lega", value: 10.0 }, 
+                        { name: "FI", value: 6.5 }, { name: "Civic List", value: 7.5 }
+                    ]},
+                    { id: 3, name: "Left Wing", isWinner: false, isApparented: false, parties: [
+                        { name: "Una città in comune", value: 7.0 }
+                    ]}
+                ];
+                document.getElementById('estimatedTotalVotes').value = 40000;
+            } else {
+                coalitions = [
+                    { id: 1, name: "Center-Left", isWinner: true, isApparented: false, parties: [
+                        { name: "PD", value: 11500 }, { name: "AVS", value: 3500 }, 
+                        { name: "La Città delle Persone", value: 1500 }, { name: "M5S", value: 1500 }, { name: "Terzo Polo", value: 2200 }
+                    ]},
+                    { id: 2, name: "Center-Right", isWinner: false, isApparented: false, parties: [
+                        { name: "FdI", value: 8500 }, { name: "Lega", value: 4000 }, 
+                        { name: "FI", value: 2500 }, { name: "Civic List", value: 3000 }
+                    ]},
+                    { id: 3, name: "Left Wing", isWinner: false, isApparented: false, parties: [
+                        { name: "Una città in comune", value: 2800 }
+                    ]}
+                ];
+            }
+            renderCoalitions();
+        }
     }
-
-    // Save/Load
     function saveScenario() {
         const data = { coalitions, inputMode, totalSeats: document.getElementById('totalSeats').value, threshold: document.getElementById('threshold').value, estimatedTotal: document.getElementById('estimatedTotalVotes').value };
-        localStorage.setItem('sim_v4_1', JSON.stringify(data)); alert("Salvataggio OK");
+        localStorage.setItem('sim_v4_1', JSON.stringify(data)); alert("Saved successfully.");
     }
     function loadSavedScenario() {
-        const d = JSON.parse(localStorage.getItem('sim_v4_1')); if(!d) return alert("No data");
+        const d = JSON.parse(localStorage.getItem('sim_v4_1')); if(!d) return alert("No saved data found.");
         coalitions = d.coalitions; inputMode = d.inputMode;
         document.getElementById('totalSeats').value = d.totalSeats; document.getElementById('threshold').value = d.threshold; document.getElementById('estimatedTotalVotes').value = d.estimatedTotal;
-        document.getElementById('modeVotes').classList.toggle('active', inputMode === 'votes'); document.getElementById('modePercent').classList.toggle('active', inputMode === 'percent'); document.getElementById('totalVotesContainer').style.display = inputMode === 'percent' ? 'block' : 'none';
-        renderCoalitions();
+        setInputMode(inputMode);
     }
-    function copyToClipboard() { if(!textReport) return; navigator.clipboard.writeText(textReport).then(()=>alert("Copiato!")); }
+    function copyToClipboard() { if(!textReport) return; navigator.clipboard.writeText(textReport).then(()=>alert("Copied to clipboard!")); }
 
-    resetData();
+    init();
 </script>
 
 </body>
