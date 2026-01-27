@@ -79,6 +79,7 @@
         <a href="#home" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Home</a>
         <a href="#about" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">About</a>
         <a href="#publications" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Publications</a>
+        <a href="#projects" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Projects</a>
         <a href="#teaching" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Teaching</a>
         <a href="#contact" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Contact</a>
     </div>
@@ -91,7 +92,10 @@
                 <div class="mb-8">
                     <!-- Profile Image Placeholder -->
                     <div class="w-32 h-32 rounded-full overflow-hidden mb-6 bg-slate-200 ring-4 ring-white shadow-lg relative">
-                         <img src="profile.jpg" 
+                         <!-- Fallback if image fails -->
+                         <div class="absolute inset-0 flex items-center justify-center text-slate-400 font-serif text-4xl">BM</div>
+                         <!-- Ideally replace with Beniamino Masi's photo -->
+                         <img src="https://ui-avatars.com/api/?name=Beniamino+Masi&background=random&size=256" 
                               alt="Dr. Beniamino Masi" 
                               class="w-full h-full object-cover"
                               onerror="this.style.display='none'">
@@ -108,7 +112,7 @@
                     <div class="flex space-x-4 text-slate-400">
                         <a href="https://scholar.google.it/citations?user=iS07mWMAAAAJ&hl=it&oi=ao" target="_blank" class="hover:text-academic-600 transition-colors" title="Google Scholar"><i data-lucide="graduation-cap" class="w-5 h-5"></i></a>
                         <!-- Add other links if available -->
-                        <a href="mailto:beniamino.masi@phd.unipi.it" class="hover:text-academic-600 transition-colors" title="Email"><i data-lucide="mail" class="w-5 h-5"></i></a>
+                        <a href="mailto:beniamino.masi@unipi.it" class="hover:text-academic-600 transition-colors" title="Email"><i data-lucide="mail" class="w-5 h-5"></i></a>
                     </div>
                 </div>
 
@@ -116,10 +120,12 @@
                 <nav class="hidden md:block space-y-3">
                     <a href="#about" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">About</a>
                     <a href="#publications" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">Publications</a>
+                    <a href="#projects" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">Projects</a>
                     <a href="#teaching" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">Teaching</a>
                     <a href="#contact" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">Contact</a>
                     
-                     <a href="cv.pdf" target="_blank" class="inline-flex items-center mt-6 text-sm font-medium text-academic-600 hover:underline">
+                    <!-- Link updated to point to 'cv.pdf' -->
+                    <a href="cv.pdf" target="_blank" class="inline-flex items-center mt-6 text-sm font-medium text-academic-600 hover:underline">
                         Download CV <i data-lucide="arrow-down-to-line" class="w-4 h-4 ml-2"></i>
                     </a>
                 </nav>
@@ -137,7 +143,7 @@
                         I am a Post-doctoral Researcher at the <strong>University of Pisa</strong> (since December 2025), currently working on the research project <strong><a href="https://www.watersens.eu/" target="_blank" class="text-academic-600 hover:underline decoration-1 underline-offset-2">WATERSENS</a></strong>. My work lies at the intersection of comparative politics, party organization, and European policy.
                     </p>
                     <p class="mb-4">
-                        Previously, I served as a Post-doctoral Researcher at the <strong>University of Padua</strong> (2023–2025), working on the project <strong><a href="https://www.ecosocialproject.com/" target="_blank" class="text-academic-600 hover:underline decoration-1 underline-offset-2">"Governing the Just Transition: Eco-social Politics and Policies in the EU"</a></strong>.
+                        Previously, I served as a Post-doctoral Researcher at the <strong>University of Padua</strong> (2023–2025), working on the "Just Transition" project.
                     </p>
                     <p class="mb-4">
                         I received my PhD in Political Science from the <strong>University of Pisa</strong> in 2024, with a thesis titled <em>"Patterns of party organizational change. Convergence and disintermediation in Europe (1969-2017)"</em>.
@@ -182,21 +188,19 @@
                             Pizzimenti E., Calossi E., Cicchi L., <span class="font-medium text-slate-900">Masi B.</span>
                         </p>
                         <p class="italic text-slate-500 text-sm mb-3">
-                            Journal of Contemporary European Studies (2024).
+                            Journal of Contemporary European Studies (2022).
                         </p>
                         <div class="flex gap-3 text-xs font-bold tracking-wide">
                             <a href="https://doi.org/10.1080/14782804.2022.2119215" target="_blank" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">DOI</a>
                             <button onclick="toggleBibtex('bib1')" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">BibTeX</button>
                         </div>
                         <div id="bib1" class="hidden mt-4 p-4 bg-slate-100 rounded text-xs font-mono text-slate-600 overflow-x-auto">
-                            @article{pizzimenti2024converge,<br>
+                            @article{pizzimenti2022converge,<br>
                               &nbsp;&nbsp;title={Do parties converge? An empirical analysis of party organizational and policy issue saliency change in Western Europe (1970–2010)},<br>
                               &nbsp;&nbsp;author={Pizzimenti, Eugenio and Calossi, Enrico and Cicchi, Lorenzo and Masi, Beniamino},<br>
                               &nbsp;&nbsp;journal={Journal of Contemporary European Studies},<br>
-                              &nbsp;&nbsp;volume={32},<br>
-							  &nbsp;&nbsp;number={1},<br>
-                              &nbsp;&nbsp;pages={1--19},<br>
-                              &nbsp;&nbsp;year={2024}<br>
+                              &nbsp;&nbsp;year={2022},<br>
+                              &nbsp;&nbsp;publisher={Taylor & Francis}<br>
                             }
                         </div>
                     </article>
@@ -221,10 +225,8 @@
                               &nbsp;&nbsp;title={The Political Foundations of Party Organizational Change},<br>
                               &nbsp;&nbsp;author={Masi, Beniamino and Pizzimenti, Eugenio},<br>
                               &nbsp;&nbsp;journal={Comparative European Politics},<br>
-                              &nbsp;&nbsp;volume={32},<br>
-							  &nbsp;&nbsp;number={1},<br>
-                              &nbsp;&nbsp;pages={1--19},<br>
-                              &nbsp;&nbsp;year={2022}<br>
+                              &nbsp;&nbsp;year={2022},<br>
+                              &nbsp;&nbsp;publisher={Springer}<br>
                             }
                         </div>
                     </article>
@@ -263,6 +265,32 @@
                 </div>
             </section>
 
+             <!-- Projects Section -->
+             <section id="projects" class="fade-in">
+                <h2 class="font-serif text-3xl text-slate-900 mb-8 pb-2 border-b border-slate-200">Projects</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Project 1 -->
+                    <div class="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                                <i data-lucide="calculator" class="w-6 h-6"></i>
+                            </div>
+                            <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded uppercase tracking-wide">Tool</span>
+                        </div>
+                        <h3 class="font-serif text-xl text-slate-900 mb-2">Municipal Election Simulator</h3>
+                        <p class="text-slate-600 text-sm mb-4 leading-relaxed">
+                            An interactive web tool designed to simulate local election outcomes under the Italian electoral system. Features include coalition management, real-time d'Hondt seat calculation, and hemicycle visualization.
+                        </p>
+                        <div class="flex gap-4 items-center mt-auto">
+                            <a href="simulatore.html" target="_blank" class="text-sm font-medium text-academic-600 hover:text-slate-900 flex items-center transition-colors">
+                                Launch Tool <i data-lucide="external-link" class="w-4 h-4 ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Teaching Section -->
             <section id="teaching" class="fade-in">
                 <h2 class="font-serif text-3xl text-slate-900 mb-6 pb-2 border-b border-slate-200">Teaching</h2>
@@ -270,12 +298,12 @@
                     <div>
                         <h3 class="text-lg font-semibold text-slate-800">Teaching Assistant</h3>
                         <p class="text-sm text-slate-500 mb-1">University of Pisa, March 2022 - Present</p>
-                        <p class="text-slate-600 text-sm leading-relaxed">Assisted with courses in “Comparative Politics”, “Public Policy Analysis and Organization Theory”, “Comparative Migration Politics and Policies”, “Geopolitics and International Relations Theories”, "Political System of the European Union".</p>
+                        <p class="text-slate-600 text-sm leading-relaxed">Assisted with courses in "Comparative Politics", "Public Policy Analysis", "Comparative Migration Politics", and "Geopolitics".</p>
                     </div>
                     <div>
                         <h3 class="text-lg font-semibold text-slate-800">Guest Lectures</h3>
-                        <p class="text-sm text-slate-500 mb-1">Various Universities, 2022-2025</p>
-                        <p class="text-slate-600 text-sm leading-relaxed">Delivered lectures on "Public Policy Analysis and Organization Theory" (Pisa), "Elections, Parties and Public Opinion" (Florence), and "Politics and Policies for Sustainable Development" (Pisa).</p>
+                        <p class="text-sm text-slate-500 mb-1">Various Universities, 2022-2024</p>
+                        <p class="text-slate-600 text-sm leading-relaxed">Delivered lectures on "Analysis of Public Policies" (Pisa), "Elections, Parties and Public Opinion" (Florence), and "Politics for Sustainable Development" (Pisa).</p>
                     </div>
                 </div>
             </section>
@@ -290,12 +318,17 @@
                 <div class="bg-white border border-slate-100 p-8 rounded-lg shadow-sm text-center">
                     <p class="text-sm text-slate-500 mb-2 uppercase tracking-wide">Email Address</p>
                     <div class="flex items-center justify-center gap-2 mb-2">
-                        <a href="mailto:beniamino.masi@phd.unipi.it" id="email-text" class="text-xl md:text-2xl font-serif text-slate-800 hover:text-academic-600 transition-colors select-all">beniamino.masi@phd.unipi.it</a>
+                        <a href="mailto:beniamino.masi@unipi.it" id="email-text" class="text-xl md:text-2xl font-serif text-slate-800 hover:text-academic-600 transition-colors select-all">beniamino.masi@unipi.it</a>
                         <button onclick="copyEmail()" class="text-slate-400 hover:text-academic-600 transition-colors p-1" title="Copy to clipboard">
                             <i data-lucide="copy" class="w-5 h-5"></i>
                         </button>
                     </div>
                     <p id="copy-feedback" class="text-xs text-green-600 h-4 opacity-0 transition-opacity">Copied to clipboard!</p>
+                </div>
+
+                <div class="mt-8 flex justify-center space-x-8 md:hidden">
+                    <a href="#" class="text-slate-400 hover:text-academic-600"><i data-lucide="twitter" class="w-6 h-6"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-academic-600"><i data-lucide="linkedin" class="w-6 h-6"></i></a>
                 </div>
             </section>
 
@@ -381,9 +414,4 @@
         });
     </script>
 </body>
-
 </html>
-
-
-
-
