@@ -199,6 +199,7 @@
         const btnVotes = document.getElementById('modeVotes');
         const btnPercent = document.getElementById('modePercent');
         
+        // We keep totalVotesContainer visible in both modes to allow manual override for ballots/majority check
         if (mode === 'votes') {
             btnVotes.className = "flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-white bg-academic-600 shadow-sm";
             btnPercent.className = "flex-1 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-900 transition-all";
@@ -233,6 +234,7 @@
                             class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 rounded bg-slate-50 focus:bg-white focus:border-academic-600 focus:outline-none transition-colors">
                         <input type="number" placeholder="${placeholderTxt}" value="${val}" step="${stepValue}" oninput="updatePartyValue(${cIndex}, ${pIndex}, this.value)" 
                             class="w-20 px-3 py-2 text-sm border border-slate-200 rounded bg-slate-50 focus:bg-white focus:border-academic-600 focus:outline-none transition-colors text-right font-mono">
+                        <span id="mirror-party-${cIndex}-${pIndex}" class="text-xs text-slate-400 font-mono w-16 text-right shrink-0 truncate"></span>
                         <button onclick="removeParty(${cIndex}, ${pIndex})" class="flex-shrink-0 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors" title="Remove List">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
@@ -288,8 +290,11 @@
                     <div class="mb-4 bg-slate-50 p-2 rounded border border-slate-100">
                         <div class="flex justify-between items-center">
                             <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Votes Only for Mayor</label>
-                            <input type="number" placeholder="${placeholderTxt}" value="${mayorOnlyVal}" step="${stepValue}" oninput="updateMayorOnlyVotes(${cIndex}, this.value)" 
-                                class="w-24 px-2 py-1 text-sm border border-slate-200 rounded focus:bg-white focus:border-academic-600 focus:outline-none transition-colors text-right font-mono bg-white">
+                            <div class="flex items-center">
+                                <input type="number" placeholder="${placeholderTxt}" value="${mayorOnlyVal}" step="${stepValue}" oninput="updateMayorOnlyVotes(${cIndex}, this.value)" 
+                                    class="w-24 px-2 py-1 text-sm border border-slate-200 rounded focus:bg-white focus:border-academic-600 focus:outline-none transition-colors text-right font-mono bg-white">
+                                <span id="mirror-mayor-${cIndex}" class="text-xs text-slate-400 font-mono w-16 text-right shrink-0 truncate ml-2"></span>
+                            </div>
                         </div>
                     </div>
                     
@@ -427,16 +432,55 @@
         let grandTotalCandidate = 0;
         let isPercent = (inputMode === 'percent');
         
-        coalitions.forEach(col => {
+        // Get estimated total for mirror conversion
+        const estimatedTotalInput = document.getElementById('estimatedTotalVotes').value;
+        const estimatedTotal = parseInt(estimatedTotalInput) || 0;
+
+        coalitions.forEach((col, cIndex) => {
             let listSum = 0;
-            col.parties.forEach(p => { listSum += Number(p.value); });
+            col.parties.forEach((p, pIndex) => { 
+                let val = Number(p.value);
+                listSum += val; 
+                
+                // Update List Mirror
+                let mirrorSpan = document.getElementById(`mirror-party-${cIndex}-${pIndex}`);
+                if(mirrorSpan && estimatedTotal > 0) {
+                    if(isPercent) {
+                        // Input is %, show votes
+                        let v = Math.round((val / 100) * estimatedTotal);
+                        mirrorSpan.innerText = `(${v.toLocaleString()})`;
+                    } else {
+                        // Input is votes, show %
+                        let pct = (val / estimatedTotal) * 100;
+                        mirrorSpan.innerText = `(${pct.toFixed(1)}%)`;
+                    }
+                } else if(mirrorSpan) {
+                    mirrorSpan.innerText = '';
+                }
+            });
             
+            // In percent mode, mayorOnlyVotes is treated as %. In votes mode, as votes.
             let mayorOnly = Number(col.mayorOnlyVotes) || 0;
             col.tempTotal = listSum + mayorOnly;
             col.tempListTotal = listSum; // Store for display
             grandTotalCandidate += col.tempTotal;
+
+            // Update Mayor Mirror
+            let mirrorMayorSpan = document.getElementById(`mirror-mayor-${cIndex}`);
+            if(mirrorMayorSpan && estimatedTotal > 0) {
+                if(isPercent) {
+                    let v = Math.round((mayorOnly / 100) * estimatedTotal);
+                    mirrorMayorSpan.innerText = `(${v.toLocaleString()})`;
+                } else {
+                    let pct = (mayorOnly / estimatedTotal) * 100;
+                    mirrorMayorSpan.innerText = `(${pct.toFixed(1)}%)`;
+                }
+            } else if(mirrorMayorSpan) {
+                mirrorMayorSpan.innerText = '';
+            }
         });
 
+        // For display percentage, we use the Grand Total of Candidates as base
         let baseForPercent = isPercent ? 100 : grandTotalCandidate;
         if(baseForPercent === 0) baseForPercent = 1;
 
@@ -492,7 +536,6 @@
             });
 
             // 2. Determine the GRAND TOTAL for Majority Check
-            
             let baseForMajority = grandTotalValidVotes;
             if(inputMode === 'percent') baseForMajority = estimatedTotal; // Use estimation as base 100%
             else if(estimatedTotal > grandTotalValidVotes) baseForMajority = estimatedTotal; // Manual override if entered
@@ -531,7 +574,7 @@
                 }
             });
 
-            // Threshold for LISTS is based on TOTAL VALID VOTES (usually)
+            // Threshold for LISTS is based on TOTAL VALID VOTES
             const thresholdVotes = baseForMajority * (thresholdPercent / 100);
             
             textReport += `📊 Total Valid Voters: ${baseForMajority.toLocaleString()}\n`;
@@ -552,10 +595,11 @@
             });
 
             let majorityResult = dHondtWithGap(majorityPoolParties, majoritySeats);
-            
+
+            // Opposition Groups Calculation based on CANDIDATE TOTAL votes
             let oppositionGroups = losingCoalitions.map(c => ({ 
                 name: c.name, 
-                votes: c.totalVotes, // Use Candidate Total for group distribution
+                votes: c.totalVotes, 
                 originalObj: c, 
                 isCoalition: true 
             }));
@@ -569,7 +613,7 @@
             let winnerPartiesResult = majorityResult.distribution.filter(p => p.originalCoalition === winningCoalition.id);
             let winnerSeatsTotal = winnerPartiesResult.reduce((a, b) => a + b.seats, 0);
             winnerPartiesResult.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'winner', party: p.name }); });
-            
+
             finalOutput.push({
                 name: winningCoalition.name, isWinner: true, isApparented: false,
                 totalVotes: winningCoalition.totalVotes, // Candidate Total
@@ -611,6 +655,7 @@
                             listResult = dHondtWithGap(validLists, availableForLists);
                             listResult.distribution.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'loser', party: p.name }); });
                         } else {
+                            // Simplified: Candidate keeps them as 'Candidate List'
                             for(let i=0; i<availableForLists; i++) allSeatsForHemicycle.push({ type: 'loser', party: "Candidate " + coalition.name });
                         }
                     }
@@ -675,7 +720,11 @@
         if (highlightedPartyName === partyName) highlightedPartyName = null;
         else highlightedPartyName = partyName;
         if(lastCalculationResult) drawHemicycle(lastCalculationResult.seatsData, lastCalculationResult.totalSeats);
+        // Actually, re-rendering is the easiest way to update the switches state for now.
         if(lastCalculationResult && lastCalculationResult.output) {
+             // Re-render but we need to reconstruct the output if we didn't save it. 
+             // Ideally we save the full 'finalOutput' to 'lastCalculationResult'
+             // For now, let's just re-draw hemicycle. The switch state is handled by the click.
         }
     }
 
