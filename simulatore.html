@@ -76,7 +76,7 @@
         <header class="text-center mb-12">
             <h1 class="font-serif text-3xl md:text-4xl font-bold text-slate-900 mb-4">Municipal Election Simulator</h1>
             <p class="text-slate-600 max-w-2xl mx-auto">
-                A tool to simulate seat distribution in Italian municipal elections (>15k inhabitants). Configure coalitions, set thresholds, and visualize the resulting city council.
+                A tool to simulate seat distribution in Italian municipal elections (>15k inhabitants). Configure coalitions, including "votes only for mayor" to accurately simulate ballot scenarios.
             </p>
         </header>
 
@@ -97,10 +97,10 @@
                     </div>
                 </div>
 
-                <!-- Total Votes (Hidden by default) -->
-                <div id="totalVotesContainer" style="display:none;">
-                    <label class="block text-xs font-bold text-academic-600 uppercase tracking-wider mb-2">Est. Total Votes</label>
-                    <input type="number" id="estimatedTotalVotes" value="40500" oninput="recalcLiveTotals()" 
+                <!-- Total Votes -->
+                <div id="totalVotesContainer">
+                    <label class="block text-xs font-bold text-academic-600 uppercase tracking-wider mb-2">Total Valid Voters</label>
+                    <input type="number" id="estimatedTotalVotes" value="40211" oninput="recalcLiveTotals()" 
                            class="w-full px-3 py-2 border border-academic-600 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-academic-600 font-semibold bg-blue-50">
                 </div>
 
@@ -113,7 +113,7 @@
 
                 <!-- Threshold -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Threshold (%)</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">List Threshold (%)</label>
                     <input type="number" id="threshold" value="3" step="0.1" 
                            class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-900 focus:border-academic-600 focus:outline-none focus:ring-1 focus:ring-academic-600 transition-colors">
                 </div>
@@ -198,22 +198,19 @@
         inputMode = mode;
         const btnVotes = document.getElementById('modeVotes');
         const btnPercent = document.getElementById('modePercent');
-        const totalContainer = document.getElementById('totalVotesContainer');
-
+        
         if (mode === 'votes') {
             btnVotes.className = "flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-white bg-academic-600 shadow-sm";
             btnPercent.className = "flex-1 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-900 transition-all";
-            totalContainer.style.display = 'none';
         } else {
             btnPercent.className = "flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-white bg-academic-600 shadow-sm";
             btnVotes.className = "flex-1 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-900 transition-all";
-            totalContainer.style.display = 'block';
         }
         renderCoalitions();
     }
 
     function resetData() {
-        coalitions = [{ id: 1, name: "Coalizione A", isWinner: true, isApparented: false, parties: [{ name: "Lista 1", value: 0 }] }];
+        coalitions = [{ id: 1, name: "Coalizione A", isWinner: true, isApparented: false, mayorOnlyVotes: 0, parties: [{ name: "Lista 1", value: 0 }] }];
         highlightedPartyName = null;
         renderCoalitions();
         document.getElementById('results').style.display = 'none';
@@ -274,14 +271,26 @@
                 `;
             }
 
+            // Votes Only Mayor Input
+            let mayorOnlyVal = col.mayorOnlyVotes > 0 ? col.mayorOnlyVotes : '';
+            
             const html = `
                 <div class="relative p-6 rounded-lg shadow-sm transition-all ${bgClass} border ${borderClass} border-t-4">
                     ${statusBadge}
                     
-                    <div class="mb-6 pr-16">
+                    <div class="mb-4 pr-16">
                         <input type="text" value="${col.name}" onchange="updateCoalitionName(${cIndex}, this.value)" 
                             class="w-full font-serif font-bold text-lg text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-academic-600 focus:outline-none pb-1 placeholder-slate-400">
-                        <div id="live-total-${cIndex}" class="text-xs font-mono text-academic-600 mt-1 h-4">Total: 0</div>
+                        <div id="live-total-${cIndex}" class="text-xs font-mono text-academic-600 mt-1">Candidate Total: 0</div>
+                    </div>
+
+                    <!-- Mayor Only Votes Section -->
+                    <div class="mb-4 bg-slate-50 p-2 rounded border border-slate-100">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Votes Only for Mayor</label>
+                            <input type="number" placeholder="${placeholderTxt}" value="${mayorOnlyVal}" step="${stepValue}" oninput="updateMayorOnlyVotes(${cIndex}, this.value)" 
+                                class="w-24 px-2 py-1 text-sm border border-slate-200 rounded focus:bg-white focus:border-academic-600 focus:outline-none transition-colors text-right font-mono bg-white">
+                        </div>
                     </div>
                     
                     <div class="mb-4">
@@ -309,7 +318,7 @@
     }
 
     function renderResults(results, totalVotes, threshold) {
-        document.getElementById('resultsSummary').innerHTML = `Base: ${totalVotes.toLocaleString()} votes • Threshold: ${Math.floor(threshold)}`;
+        document.getElementById('resultsSummary').innerHTML = `Base (Valid Candidates): ${totalVotes.toLocaleString()} votes • List Threshold: ${Math.floor(threshold)}`;
         const container = document.getElementById('resultsDetails');
         container.innerHTML = '';
         
@@ -326,6 +335,9 @@
 
             res.details.sort((a,b) => b.votes - a.votes);
             res.details.forEach(party => {
+                // Percentage is relative to what? Typically list votes relative to Total Valid VOTES (candidates) or Total VALID VOTES (lists)?
+                // In Italy, threshold is 3% of VALID VOTES (Lists + Only Mayor usually? No, usually valid votes). 
+                // Let's keep it relative to Grand Total Candidates for simplicity or just visual.
                 let perc = totalVotes > 0 ? ((party.votes / totalVotes) * 100).toFixed(2) : 0;
                 
                 // Badges
@@ -393,6 +405,11 @@
                         <h3 class="font-serif font-bold text-md ${headerColor} truncate pr-2">${res.name} ${icon}</h3>
                         <span class="font-mono font-bold text-lg text-slate-800 shrink-0">${res.seatsTotal}</span>
                     </div>
+                    <div class="px-3 py-2 bg-slate-50 border-b border-slate-100 flex justify-between text-xs text-slate-500">
+                        <span>Lists: ${res.listVotes.toLocaleString()}</span>
+                        <span>Mayor Only: ${res.mayorOnlyVotes.toLocaleString()}</span>
+                        <strong>Total: ${res.totalVotes.toLocaleString()}</strong>
+                    </div>
                     <div class="px-1 py-1">
                         ${detailsHtml}
                     </div>
@@ -401,34 +418,42 @@
         
         const resultsEl = document.getElementById('results');
         resultsEl.classList.remove('hidden');
-        resultsEl.style.display = 'block'; // Ensure visibility
+        resultsEl.style.display = 'block'; 
         resultsEl.scrollIntoView({behavior: 'smooth'});
     }
 
     // --- LOGIC FUNCTIONS ---
     function recalcLiveTotals() {
-        let grandTotal = 0;
+        let grandTotalCandidate = 0;
         let isPercent = (inputMode === 'percent');
         
         coalitions.forEach(col => {
-            col.tempSum = 0;
-            col.parties.forEach(p => { col.tempSum += Number(p.value); });
-            grandTotal += col.tempSum;
+            let listSum = 0;
+            col.parties.forEach(p => { listSum += Number(p.value); });
+            
+            let mayorOnly = Number(col.mayorOnlyVotes) || 0;
+            col.tempTotal = listSum + mayorOnly;
+            col.tempListTotal = listSum; // Store for display
+            grandTotalCandidate += col.tempTotal;
         });
 
-        let baseForPercent = isPercent ? 100 : grandTotal;
+        let baseForPercent = isPercent ? 100 : grandTotalCandidate;
         if(baseForPercent === 0) baseForPercent = 1;
 
         coalitions.forEach((col, index) => {
             let el = document.getElementById(`live-total-${index}`);
             if(el) {
-                let suffix = isPercent ? '%' : ' votes';
+                let suffix = isPercent ? '%' : '';
                 let percentVal = 0;
                 
-                if (isPercent) percentVal = col.tempSum;
-                else percentVal = (col.tempSum / baseForPercent) * 100;
+                if (isPercent) percentVal = col.tempTotal;
+                else percentVal = (col.tempTotal / baseForPercent) * 100;
                 
-                el.innerHTML = `Total: <span class="font-bold">${col.tempSum.toLocaleString()}${suffix}</span> <span class="text-slate-400 font-normal">(${percentVal.toFixed(1)}%)</span>`;
+                // Formatting numbers
+                let listStr = col.tempListTotal.toLocaleString();
+                let totalStr = col.tempTotal.toLocaleString();
+                
+                el.innerHTML = `Lists: <span class="font-semibold">${listStr}${suffix}</span> • Cand. Total: <span class="font-bold">${totalStr}${suffix}</span> <span class="text-slate-400 font-normal">(${percentVal.toFixed(1)}%)</span>`;
             }
         });
     }
@@ -440,28 +465,47 @@
 
             const totalSeats = parseInt(document.getElementById('totalSeats').value);
             const thresholdPercent = parseFloat(document.getElementById('threshold').value);
-            const estimatedTotal = parseInt(document.getElementById('estimatedTotalVotes').value) || 0;
+            // Always try to get estimated total if present
+            const estimatedTotalInput = document.getElementById('estimatedTotalVotes').value;
+            const estimatedTotal = parseInt(estimatedTotalInput) || 0;
             
-            if(inputMode === 'percent' && estimatedTotal <= 0) { alert("Please enter Estimated Total Votes."); return; }
+            if(inputMode === 'percent' && estimatedTotal <= 0) { alert("Please enter Total Valid Voters."); return; }
 
-            let grandTotalVotes = 0;
+            let grandTotalListVotes = 0; // Sum of all LIST votes
+            let grandTotalValidVotes = 0; // Sum of all CANDIDATE votes (Lists + MayorOnly)
+            
             let simCoalitions = JSON.parse(JSON.stringify(coalitions)); 
+            
+            // 1. Calculate votes
             simCoalitions.forEach(col => {
-                col.totalVotes = 0;
+                col.listTotal = 0;
                 col.parties.forEach(p => {
                     p.votes = inputMode === 'percent' ? Math.round((p.value / 100) * estimatedTotal) : Number(p.value);
-                    col.totalVotes += p.votes;
+                    col.listTotal += p.votes;
                 });
-                grandTotalVotes += col.totalVotes;
+                
+                let mayorOnly = inputMode === 'percent' ? Math.round((col.mayorOnlyVotes / 100) * estimatedTotal) : Number(col.mayorOnlyVotes);
+                col.totalVotes = col.listTotal + mayorOnly; // Candidate Total
+                
+                grandTotalListVotes += col.listTotal;
+                grandTotalValidVotes += col.totalVotes;
             });
 
-            const absoluteMajority = Math.floor(grandTotalVotes / 2) + 1;
+            // 2. Determine the GRAND TOTAL for Majority Check
+            
+            let baseForMajority = grandTotalValidVotes;
+            if(inputMode === 'percent') baseForMajority = estimatedTotal; // Use estimation as base 100%
+            else if(estimatedTotal > grandTotalValidVotes) baseForMajority = estimatedTotal; // Manual override if entered
+
+            const absoluteMajority = Math.floor(baseForMajority / 2) + 1;
+            
+            // 3. Check for Winner using CANDIDATE TOTAL
             let firstRoundWinner = simCoalitions.find(c => c.totalVotes >= absoluteMajority);
             let winningCoalition = null;
             let isFirstRoundVictory = false;
 
             if (firstRoundWinner) {
-                alert(`⚠️ FIRST ROUND VICTORY: "${firstRoundWinner.name}" exceeded 50% (${firstRoundWinner.totalVotes.toLocaleString()} votes).`);
+                alert(`⚠️ FIRST ROUND VICTORY: "${firstRoundWinner.name}" exceeded 50% (${firstRoundWinner.totalVotes.toLocaleString()} votes).\n(Threshold: ${absoluteMajority.toLocaleString()})`);
                 isFirstRoundVictory = true;
                 winningCoalition = firstRoundWinner;
                 simCoalitions.forEach(c => {
@@ -472,7 +516,7 @@
                 winningCoalition = simCoalitions.find(c => c.isWinner);
             }
 
-            if(!winningCoalition) { alert("No coalition >50% and no Ballot Winner selected!"); return; }
+            if(!winningCoalition) { alert("No candidate >50% and no Ballot Winner selected! Please select a winner for the runoff."); return; }
 
             let apparentedCoalitions = [];
             let losingCoalitions = [];
@@ -487,10 +531,12 @@
                 }
             });
 
-            const thresholdVotes = grandTotalVotes * (thresholdPercent / 100);
+            // Threshold for LISTS is based on TOTAL VALID VOTES (usually)
+            const thresholdVotes = baseForMajority * (thresholdPercent / 100);
             
-            textReport += `📊 Base: ${grandTotalVotes.toLocaleString()}\n`;
-            textReport += `🚧 Threshold ${thresholdPercent}%: ${Math.floor(thresholdVotes)}\n`;
+            textReport += `📊 Total Valid Voters: ${baseForMajority.toLocaleString()}\n`;
+            textReport += `📊 Total List Votes: ${grandTotalListVotes.toLocaleString()}\n`;
+            textReport += `🚧 List Threshold (${thresholdPercent}%): ${Math.floor(thresholdVotes)}\n`;
             
             const majoritySeats = Math.ceil(totalSeats * 0.6); 
             const minoritySeats = totalSeats - majoritySeats;
@@ -506,21 +552,30 @@
             });
 
             let majorityResult = dHondtWithGap(majorityPoolParties, majoritySeats);
-
-            let oppositionGroups = losingCoalitions.map(c => ({ name: c.name, votes: c.totalVotes, originalObj: c, isCoalition: true }));
-            oppositionGroups = oppositionGroups.filter(g => g.votes >= thresholdVotes);
+            
+            let oppositionGroups = losingCoalitions.map(c => ({ 
+                name: c.name, 
+                votes: c.totalVotes, // Use Candidate Total for group distribution
+                originalObj: c, 
+                isCoalition: true 
+            }));
+            
             let oppositionGroupResult = dHondtWithGap(oppositionGroups, minoritySeats);
 
             let finalOutput = [];
             let allSeatsForHemicycle = []; 
 
+            // WINNER
             let winnerPartiesResult = majorityResult.distribution.filter(p => p.originalCoalition === winningCoalition.id);
             let winnerSeatsTotal = winnerPartiesResult.reduce((a, b) => a + b.seats, 0);
             winnerPartiesResult.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'winner', party: p.name }); });
-
+            
             finalOutput.push({
                 name: winningCoalition.name, isWinner: true, isApparented: false,
-                totalVotes: winningCoalition.totalVotes, seatsTotal: winnerSeatsTotal,
+                totalVotes: winningCoalition.totalVotes, // Candidate Total
+                listVotes: winningCoalition.listTotal,
+                mayorOnlyVotes: winningCoalition.totalVotes - winningCoalition.listTotal,
+                seatsTotal: winnerSeatsTotal,
                 details: winnerPartiesResult, mayorSeat: false
             });
 
@@ -531,7 +586,10 @@
 
                 finalOutput.push({
                     name: acol.name + " (App.)", isWinner: false, isApparented: true,
-                    totalVotes: acol.totalVotes, seatsTotal: acolSeatsTotal,
+                    totalVotes: acol.totalVotes,
+                    listVotes: acol.listTotal,
+                    mayorOnlyVotes: acol.totalVotes - acol.listTotal,
+                    seatsTotal: acolSeatsTotal,
                     details: acolPartiesResult, mayorSeat: false 
                 });
             });
@@ -542,16 +600,26 @@
                 if (seatsForCoalition > 0) {
                     allSeatsForHemicycle.push({ type: 'loser', party: "Candidate " + coalition.name }); 
                     
-                    let availableForLists = seatsForCoalition - 1;
+                    let availableForLists = seatsForCoalition - 1; // 1 Seat goes to Candidate
+                    
                     let validLists = coalition.parties.filter(p => p.votes >= thresholdVotes);
+                    
                     let listResult = { distribution: validLists.map(p => ({...p, seats: 0, gap: null })) };
+                    
                     if (availableForLists > 0) {
-                        listResult = dHondtWithGap(validLists, availableForLists);
-                        listResult.distribution.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'loser', party: p.name }); });
+                        if(validLists.length > 0) {
+                            listResult = dHondtWithGap(validLists, availableForLists);
+                            listResult.distribution.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'loser', party: p.name }); });
+                        } else {
+                            for(let i=0; i<availableForLists; i++) allSeatsForHemicycle.push({ type: 'loser', party: "Candidate " + coalition.name });
+                        }
                     }
                     finalOutput.push({
                         name: coalition.name, isWinner: false, isApparented: false,
-                        totalVotes: coalition.totalVotes, seatsTotal: seatsForCoalition,
+                        totalVotes: coalition.totalVotes,
+                        listVotes: coalition.listTotal,
+                        mayorOnlyVotes: coalition.totalVotes - coalition.listTotal,
+                        seatsTotal: seatsForCoalition,
                         details: listResult.distribution, mayorSeat: true
                     });
                 }
@@ -559,7 +627,7 @@
 
             finalOutput.forEach(res => {
                 let icon = "🔻"; if(res.isWinner) icon = "🏆"; if(res.isApparented) icon = "🤝";
-                textReport += `${icon} *${res.name.toUpperCase()}*: ${res.seatsTotal} Seats\n`;
+                textReport += `${icon} *${res.name.toUpperCase()}*: ${res.seatsTotal} Seats (Cand: ${res.totalVotes.toLocaleString()})\n`;
                 if(res.mayorSeat) textReport += `   👤 1 Mayor Seat\n`;
                 res.details.sort((a,b) => b.votes - a.votes);
                 res.details.forEach(p => {
@@ -571,7 +639,7 @@
 
             lastCalculationResult = { seatsData: allSeatsForHemicycle, totalSeats: totalSeats };
             drawHemicycle(allSeatsForHemicycle, totalSeats);
-            renderResults(finalOutput, grandTotalVotes, thresholdVotes);
+            renderResults(finalOutput, baseForMajority, thresholdVotes);
         } catch(e) {
             console.error(e);
             alert("An error occurred during calculation. Check console for details.");
@@ -607,12 +675,7 @@
         if (highlightedPartyName === partyName) highlightedPartyName = null;
         else highlightedPartyName = partyName;
         if(lastCalculationResult) drawHemicycle(lastCalculationResult.seatsData, lastCalculationResult.totalSeats);
-        // Do NOT re-render full results here as it resets switches. Just visually update if needed.
-        // Actually, re-rendering is the easiest way to update the switches state for now.
         if(lastCalculationResult && lastCalculationResult.output) {
-             // Re-render but we need to reconstruct the output if we didn't save it. 
-             // Ideally we save the full 'finalOutput' to 'lastCalculationResult'
-             // For now, let's just re-draw hemicycle. The switch state is handled by the click.
         }
     }
 
@@ -677,9 +740,10 @@
     function updateParty(cIndex, pIndex, field, value) { if(field === 'name') coalitions[cIndex].parties[pIndex].name = value; }
     function updatePartyValue(cIndex, pIndex, value) { coalitions[cIndex].parties[pIndex].value = value; recalcLiveTotals(); }
     function updateCoalitionName(cIndex, value) { coalitions[cIndex].name = value; }
+    function updateMayorOnlyVotes(cIndex, value) { coalitions[cIndex].mayorOnlyVotes = value; recalcLiveTotals(); }
     function addParty(cIndex) { coalitions[cIndex].parties.push({ name: "List " + (coalitions[cIndex].parties.length + 1), value: 0 }); renderCoalitions(); }
     function removeParty(cIndex, pIndex) { coalitions[cIndex].parties.splice(pIndex, 1); renderCoalitions(); }
-    function addCoalition() { coalitions.push({ id: Date.now(), name: "Coalition " + (coalitions.length + 1), isWinner: false, isApparented: false, parties: [{ name: "List 1", value: 0 }] }); renderCoalitions(); }
+    function addCoalition() { coalitions.push({ id: Date.now(), name: "Coalition " + (coalitions.length + 1), isWinner: false, isApparented: false, mayorOnlyVotes: 0, parties: [{ name: "List 1", value: 0 }] }); renderCoalitions(); }
     function removeCoalition(index) { if(confirm("Delete this coalition?")) { coalitions.splice(index, 1); renderCoalitions(); }}
     function setWinner(index) { coalitions.forEach((c, i) => { c.isWinner = (i === index); if(c.isWinner) c.isApparented = false; }); renderCoalitions(); }
     function setApparented(index, isChecked) { coalitions[index].isApparented = isChecked; if(isChecked) coalitions[index].isWinner = false; renderCoalitions(); }
@@ -687,45 +751,46 @@
         if(type === 'Pisa2023') {
             if(inputMode === 'percent') {
                  coalitions = [
-                    { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, parties: [
-                        { name: "Fratelli d'Italia", value: 16.5 }, { name: "Michele Conti Sindaco", value: 14.5 }, 
-                        { name: "Lega", value: 10.0 }, { name: "Pesciatini per Pisa", value: 4.5 }, 
-                        { name: "Forza Italia - UDC - PLI", value: 3.4 }, { name: "Pisa Punto Zero", value: 1.0 }
+                    { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, mayorOnlyVotes: 3.0, parties: [
+                        { name: "Fratelli d'Italia", value: 16.9 }, { name: "Michele Conti Sindaco", value: 14.7 }, 
+                        { name: "Lega", value: 10.4 }, { name: "Pesciatini per Pisa", value: 4.8 }, 
+                        { name: "Forza Italia - UDC - PLI", value: 3.5 }, { name: "Pisa Punto Zero", value: 1.0 }
                     ]},
-                    { id: 2, name: "Paolo Martinelli (Centrosinistra)", isWinner: false, isApparented: false, parties: [
-                        { name: "Partito Democratico", value: 23.5 }, { name: "La Città delle Persone", value: 6.0 }, 
-                        { name: "Sinistra Unita per Pisa", value: 5.0 }, { name: "Movimento 5 Stelle", value: 3.1 },
-                        { name: "Riformisti per Pisa", value: 3.5 }
+                    { id: 2, name: "Paolo Martinelli (Centrosinistra)", isWinner: false, isApparented: false, mayorOnlyVotes: 3.1, parties: [
+                        { name: "Partito Democratico", value: 23.9 }, { name: "La Città delle Persone", value: 5.6 }, 
+                        { name: "Sinistra Unita per Pisa", value: 4.9 }, { name: "Movimento 5 Stelle", value: 3.0 },
+                        { name: "Riformisti per Pisa", value: 2.2 }
                     ]},
-                    { id: 3, name: "Ciccio Auletta (Sinistra)", isWinner: false, isApparented: false, parties: [
-                        { name: "Una città in comune", value: 5.2 }, { name: "Unione Popolare", value: 1.5 }
+                    { id: 3, name: "Ciccio Auletta (Sinistra)", isWinner: false, isApparented: false, mayorOnlyVotes: 0.1, parties: [
+                        { name: "Una città in comune", value: 5.1 }, { name: "Unione Popolare", value: 1.4 }
                     ]},
-                     { id: 4, name: "Altri Candidati", isWinner: false, isApparented: false, parties: [
+                     { id: 4, name: "Altri Candidati", isWinner: false, isApparented: false, mayorOnlyVotes: 0.2, parties: [
                         { name: "Rita Mariotti (Terzo Polo)", value: 1.3 }, { name: "Alexandre Dei (Patto Civico)", value: 0.6 },
-                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 0.4 }
+                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 0.5 }
                     ]}
                 ];
-                document.getElementById('estimatedTotalVotes').value = 40220;
+                document.getElementById('estimatedTotalVotes').value = 40500;
             } else {
                  coalitions = [
-                    { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, parties: [
-                        { name: "Fratelli d'Italia", value: 6600 }, { name: "Michele Conti Sindaco", value: 5800 }, 
-                        { name: "Lega", value: 4000 }, { name: "Pesciatini per Pisa", value: 1800 }, 
-                        { name: "Forza Italia - UDC - PLI", value: 1400 }, { name: "Pisa Punto Zero", value: 490 }
+                    { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, mayorOnlyVotes: 1229, parties: [
+                        { name: "Fratelli d'Italia", value: 6415 }, { name: "Michele Conti Sindaco", value: 5470 }, 
+                        { name: "Lega", value: 3889 }, { name: "Pesciatini per Pisa", value: 1677 }, 
+                        { name: "Forza Italia - UDC - PLI", value: 1126 }, { name: "Pisa Punto Zero", value: 285 }
                     ]},
-                    { id: 2, name: "Paolo Martinelli (Centrosinistra)", isWinner: false, isApparented: false, parties: [
-                        { name: "Partito Democratico", value: 9400 }, { name: "La Città delle Persone", value: 2400 }, 
-                        { name: "Sinistra Unita per Pisa", value: 2000 }, { name: "Movimento 5 Stelle", value: 1230 },
-                        { name: "Riformisti per Pisa", value: 1500 }
+                    { id: 2, name: "Paolo Martinelli (Centrosinistra)", isWinner: false, isApparented: false, mayorOnlyVotes: 1274, parties: [
+                        { name: "Partito Democratico", value: 8847 }, { name: "La Città delle Persone", value: 2532 }, 
+                        { name: "Sinistra Unita per Pisa", value: 1902 }, { name: "Movimento 5 Stelle", value: 1146 },
+                        { name: "Riformisti per Pisa", value: 833 }
                     ]},
-                    { id: 3, name: "Ciccio Auletta (Sinistra)", isWinner: false, isApparented: false, parties: [
-                        { name: "Una città in comune", value: 2100 }, { name: "Unione Popolare", value: 600 }
+                    { id: 3, name: "Ciccio Auletta (Sinistra)", isWinner: false, isApparented: false, mayorOnlyVotes: 9, parties: [
+                        { name: "Una città in comune", value: 1991 }, { name: "Unione Popolare", value: 706 }
                     ]},
-                     { id: 4, name: "Altri Candidati", isWinner: false, isApparented: false, parties: [
-                        { name: "Rita Mariotti (Terzo Polo)", value: 530 }, { name: "Alexandre Dei (Patto Civico)", value: 250 },
-                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 120 }
+                     { id: 4, name: "Altri Candidati", isWinner: false, isApparented: false, mayorOnlyVotes: 22, parties: [
+                        { name: "Rita Mariotti (Terzo Polo)", value: 508 }, { name: "Alexandre Dei (Patto Civico)", value: 246 },
+                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 77 }
                     ]}
                 ];
+                document.getElementById('estimatedTotalVotes').value = 40211;
             }
             renderCoalitions();
         }
