@@ -305,6 +305,46 @@
     }
 
     function setInputMode(mode) {
+        if (mode === inputMode) return;
+
+        const totalVotesInput = document.getElementById('estimatedTotalVotes').value;
+        const totalVotes = parseInt(totalVotesInput) || 0;
+
+        // Auto-conversion Logic
+        if (totalVotes > 0) {
+            if (mode === 'percent') {
+                // Converting Votes -> Percent
+                coalitions.forEach(col => {
+                    col.parties.forEach(p => {
+                        let val = parseFloat(p.value) || 0;
+                        let pct = (val / totalVotes) * 100;
+                        // Use parseFloat to keep it numeric and remove unnecessary trailing zeros
+                        p.value = parseFloat(pct.toFixed(2));
+                    });
+                    let mVal = parseFloat(col.mayorOnlyVotes) || 0;
+                    let mPct = (mVal / totalVotes) * 100;
+                    col.mayorOnlyVotes = parseFloat(mPct.toFixed(2));
+                });
+            } else {
+                // Converting Percent -> Votes
+                coalitions.forEach(col => {
+                    col.parties.forEach(p => {
+                        let val = parseFloat(p.value) || 0;
+                        p.value = Math.round((val / 100) * totalVotes);
+                    });
+                    let mVal = parseFloat(col.mayorOnlyVotes) || 0;
+                    col.mayorOnlyVotes = Math.round((mVal / 100) * totalVotes);
+                });
+            }
+        } else {
+            // Guard against converting with 0 total votes if data exists
+            const hasData = coalitions.some(c => c.parties.some(p => p.value > 0) || c.mayorOnlyVotes > 0);
+            if (hasData) {
+                alert("Cannot convert values because 'Total Valid Voters' is zero. Please enter a total first.");
+                return;
+            }
+        }
+
         inputMode = mode;
         const btnVotes = document.getElementById('modeVotes');
         const btnPercent = document.getElementById('modePercent');
@@ -320,6 +360,7 @@
             statusBar.classList.remove('hidden');
         }
         renderCoalitions();
+        recalcLiveTotals();
     }
 
     function resetData() {
