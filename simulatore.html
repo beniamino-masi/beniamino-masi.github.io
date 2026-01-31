@@ -125,6 +125,21 @@
             </div>
         </div>
 
+        <div id="percentStatusBar" class="hidden mb-8 flex items-center justify-between px-2">
+            <div class="flex items-center space-x-3">
+                <span class="text-sm font-bold text-slate-500 uppercase tracking-wide">Total:</span>
+                <span class="text-xl font-serif font-bold text-slate-800" id="percentTotalDisplay">0.0%</span>
+                <span id="percentOkContainer" class="hidden text-green-600 bg-green-50 px-2 py-0.5 rounded text-xs font-bold border border-green-200">
+                    <i data-lucide="check" class="w-3 h-3 inline mr-1"></i> OK
+                </span>
+            </div>
+            <div id="percentActionContainer" class="hidden">
+                <button onclick="normalizePercentages()" class="text-sm font-medium text-academic-600 hover:text-academic-900 underline underline-offset-4 decoration-1 hover:decoration-2 transition-all">
+                    Normalize to 100%
+                </button>
+            </div>
+        </div>
+
         <div class="flex justify-between items-center mb-6">
             <h3 class="font-serif text-xl text-slate-900">Coalitions & Lists</h3>
             <button onclick="addCoalition()" class="flex items-center px-4 py-2 bg-academic-600 text-white rounded-lg hover:bg-academic-900 transition-colors shadow-sm text-sm font-medium">
@@ -293,13 +308,16 @@
         inputMode = mode;
         const btnVotes = document.getElementById('modeVotes');
         const btnPercent = document.getElementById('modePercent');
+        const statusBar = document.getElementById('percentStatusBar');
         
         if (mode === 'votes') {
             btnVotes.className = "flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-white bg-academic-600 shadow-sm";
             btnPercent.className = "flex-1 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-900 transition-all";
+            statusBar.classList.add('hidden');
         } else {
             btnPercent.className = "flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-white bg-academic-600 shadow-sm";
             btnVotes.className = "flex-1 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-900 transition-all";
+            statusBar.classList.remove('hidden');
         }
         renderCoalitions();
     }
@@ -317,6 +335,18 @@
         const placeholderTxt = inputMode === 'percent' ? '%' : 'Votes';
         const stepValue = inputMode === 'percent' ? '0.1' : '1';
 
+        const updateMirror = (val, estimatedTotal) => {
+            if (estimatedTotal <= 0) return '';
+            if (inputMode === 'percent') {
+                return `(${Math.round((val / 100) * estimatedTotal).toLocaleString()})`;
+            } else {
+                return `(${((val / estimatedTotal) * 100).toFixed(1)}%)`;
+            }
+        };
+
+        const estimatedTotalInput = document.getElementById('estimatedTotalVotes').value;
+        const estimatedTotal = parseInt(estimatedTotalInput) || 0;
+
         coalitions.forEach((col, cIndex) => {
             let partiesHtml = '';
             col.parties.forEach((party, pIndex) => {
@@ -327,7 +357,9 @@
                             class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 rounded bg-slate-50 focus:bg-white focus:border-academic-600 focus:outline-none transition-colors">
                         <input type="number" placeholder="${placeholderTxt}" value="${val}" step="${stepValue}" oninput="updatePartyValue(${cIndex}, ${pIndex}, this.value)" 
                             class="w-20 px-3 py-2 text-sm border border-slate-200 rounded bg-slate-50 focus:bg-white focus:border-academic-600 focus:outline-none transition-colors text-right font-mono">
-                        <span id="mirror-party-${cIndex}-${pIndex}" class="text-xs text-slate-400 font-mono w-16 text-right shrink-0 truncate"></span>
+                        <span id="mirror-party-${cIndex}-${pIndex}" class="text-xs text-slate-400 font-mono w-16 text-right shrink-0 truncate">
+                            ${updateMirror(Number(val), estimatedTotal)}
+                        </span>
                         <button onclick="removeParty(${cIndex}, ${pIndex})" class="flex-shrink-0 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors" title="Remove List">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
@@ -383,7 +415,9 @@
                             <div class="flex items-center">
                                 <input type="number" placeholder="${placeholderTxt}" value="${mayorOnlyVal}" step="${stepValue}" oninput="updateMayorOnlyVotes(${cIndex}, this.value)" 
                                     class="w-24 px-2 py-1 text-sm border border-slate-200 rounded focus:bg-white focus:border-academic-600 focus:outline-none transition-colors text-right font-mono bg-white">
-                                <span id="mirror-mayor-${cIndex}" class="text-xs text-slate-400 font-mono w-16 text-right shrink-0 truncate ml-2"></span>
+                                <span id="mirror-mayor-${cIndex}" class="text-xs text-slate-400 font-mono w-16 text-right shrink-0 truncate ml-2">
+                                    ${updateMirror(Number(mayorOnlyVal), estimatedTotal)}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -510,6 +544,31 @@
         resultsEl.scrollIntoView({behavior: 'smooth'});
     }
 
+    // --- LOGIC FUNCTIONS ---
+    function normalizePercentages() {
+        let currentTotal = 0;
+        coalitions.forEach(col => {
+            col.parties.forEach(p => { currentTotal += Number(p.value); });
+            currentTotal += Number(col.mayorOnlyVotes);
+        });
+
+        if (currentTotal === 0) return alert("Total is 0, cannot normalize.");
+
+        const factor = 100 / currentTotal;
+        
+        coalitions.forEach(col => {
+            col.parties.forEach(p => {
+                p.value = (Number(p.value) * factor).toFixed(2);
+                if (p.value.endsWith('.00')) p.value = parseInt(p.value);
+            });
+            col.mayorOnlyVotes = (Number(col.mayorOnlyVotes) * factor).toFixed(2);
+            if (String(col.mayorOnlyVotes).endsWith('.00')) col.mayorOnlyVotes = parseInt(col.mayorOnlyVotes);
+        });
+
+        renderCoalitions();
+        recalcLiveTotals();
+    }
+
     function recalcLiveTotals() {
         let grandTotalCandidate = 0;
         let isPercent = (inputMode === 'percent');
@@ -517,44 +576,35 @@
         const estimatedTotalInput = document.getElementById('estimatedTotalVotes').value;
         const estimatedTotal = parseInt(estimatedTotalInput) || 0;
 
+        const updateMirror = (val, id) => {
+            let mirrorSpan = document.getElementById(id);
+            if(mirrorSpan && estimatedTotal > 0) {
+                if(isPercent) {
+                    let v = Math.round((val / 100) * estimatedTotal);
+                    mirrorSpan.innerText = `(${v.toLocaleString()})`;
+                } else {
+                    let pct = (val / estimatedTotal) * 100;
+                    mirrorSpan.innerText = `(${pct.toFixed(1)}%)`;
+                }
+            } else if(mirrorSpan) {
+                mirrorSpan.innerText = '';
+            }
+        };
+
         coalitions.forEach((col, cIndex) => {
             let listSum = 0;
             col.parties.forEach((p, pIndex) => { 
                 let val = Number(p.value);
                 listSum += val; 
-                
-                let mirrorSpan = document.getElementById(`mirror-party-${cIndex}-${pIndex}`);
-                if(mirrorSpan && estimatedTotal > 0) {
-                    if(isPercent) {
-                        let v = Math.round((val / 100) * estimatedTotal);
-                        mirrorSpan.innerText = `(${v.toLocaleString()})`;
-                    } else {
-                        let pct = (val / estimatedTotal) * 100;
-                        mirrorSpan.innerText = `(${pct.toFixed(1)}%)`;
-                    }
-                } else if(mirrorSpan) {
-                    mirrorSpan.innerText = '';
-                }
+                updateMirror(val, `mirror-party-${cIndex}-${pIndex}`);
             });
             
-            // In percent mode, mayorOnlyVotes is treated as %. In votes mode, as votes.
             let mayorOnly = Number(col.mayorOnlyVotes) || 0;
+            updateMirror(mayorOnly, `mirror-mayor-${cIndex}`);
+
             col.tempTotal = listSum + mayorOnly;
             col.tempListTotal = listSum; 
             grandTotalCandidate += col.tempTotal;
-
-            let mirrorMayorSpan = document.getElementById(`mirror-mayor-${cIndex}`);
-            if(mirrorMayorSpan && estimatedTotal > 0) {
-                if(isPercent) {
-                    let v = Math.round((mayorOnly / 100) * estimatedTotal);
-                    mirrorMayorSpan.innerText = `(${v.toLocaleString()})`;
-                } else {
-                    let pct = (mayorOnly / estimatedTotal) * 100;
-                    mirrorMayorSpan.innerText = `(${pct.toFixed(1)}%)`;
-                }
-            } else if(mirrorMayorSpan) {
-                mirrorMayorSpan.innerText = '';
-            }
         });
 
         let baseForPercent = isPercent ? 100 : grandTotalCandidate;
@@ -575,6 +625,34 @@
                 el.innerHTML = `Lists: <span class="font-semibold">${listStr}${suffix}</span> • Cand. Total: <span class="font-bold">${totalStr}${suffix}</span> <span class="text-slate-400 font-normal">(${percentVal.toFixed(1)}%)</span>`;
             }
         });
+
+        // Update Global Percentage Status Bar
+        if (isPercent) {
+            const display = document.getElementById('percentTotalDisplay');
+            const actionContainer = document.getElementById('percentActionContainer');
+            const okContainer = document.getElementById('percentOkContainer');
+            const bar = document.getElementById('percentStatusBar');
+
+            const totalFixed = parseFloat(grandTotalCandidate.toFixed(2));
+            display.innerText = totalFixed + "%";
+
+            // Simple styling changes based on total
+            if (Math.abs(totalFixed - 100) < 0.05) {
+                display.classList.remove('text-amber-600', 'text-red-600');
+                display.classList.add('text-green-600');
+                actionContainer.classList.add('hidden');
+                okContainer.classList.remove('hidden');
+            } else {
+                display.classList.remove('text-green-600');
+                display.classList.add('text-slate-800');
+                actionContainer.classList.remove('hidden');
+                okContainer.classList.add('hidden');
+            }
+            bar.classList.remove('hidden');
+        } else {
+            document.getElementById('percentStatusBar').classList.add('hidden');
+        }
+        lucide.createIcons();
     }
 
     function calculateResults() {
@@ -587,14 +665,28 @@
             const estimatedTotalInput = document.getElementById('estimatedTotalVotes').value;
             const estimatedTotal = parseInt(estimatedTotalInput) || 0;
             
-            if(inputMode === 'percent' && estimatedTotal <= 0) { alert("Please enter Total Valid Voters."); return; }
+            if(inputMode === 'percent') {
+                if (estimatedTotal <= 0) { alert("Please enter Total Valid Voters."); return; }
+                
+                // Double check sum
+                let currentTotal = 0;
+                coalitions.forEach(col => {
+                    col.parties.forEach(p => { currentTotal += Number(p.value); });
+                    currentTotal += Number(col.mayorOnlyVotes);
+                });
+                
+                if (Math.abs(currentTotal - 100) > 0.1) {
+                    if(!confirm(`Total percentage is ${currentTotal.toFixed(1)}% (not 100%).\n\nClick OK to automatically normalize values to 100% and proceed.\nClick Cancel to adjust manually.`)) {
+                        return;
+                    }
+                }
+            }
 
             let grandTotalListVotes = 0; 
             let grandTotalValidVotes = 0; 
             
             let simCoalitions = JSON.parse(JSON.stringify(coalitions)); 
             
-            // 1. Calculate votes
             simCoalitions.forEach(col => {
                 col.listTotal = 0;
                 col.parties.forEach(p => {
@@ -610,10 +702,6 @@
             });
 
             // 2. Determine the GRAND TOTAL for Majority Check
-            // We use the calculated grandTotalValidVotes (sum of all candidates)
-            // Unless the manual input is higher (e.g. invalid votes? No, usually valid votes). 
-            // In 'votes' mode, we trust the inputs. 
-            // In 'percent' mode, the 'estimatedTotal' represents the 100% base.
             let baseForMajority = grandTotalValidVotes;
             if(inputMode === 'percent') baseForMajority = estimatedTotal; 
             else if(estimatedTotal > grandTotalValidVotes) baseForMajority = estimatedTotal; // Manual override if entered
@@ -652,8 +740,8 @@
                 }
             });
 
-            // Threshold for LISTS is based on TOTAL VALID VOTES (usually)
-            const thresholdVotes = baseForMajority * (thresholdPercent / 100);
+            // Threshold for LISTS is based on TOTAL LIST VOTES (TUEL)
+            const thresholdVotes = grandTotalListVotes * (thresholdPercent / 100);
             
             textReport += `📊 Total Valid Voters: ${baseForMajority.toLocaleString()}\n`;
             textReport += `📊 Total List Votes: ${grandTotalListVotes.toLocaleString()}\n`;
@@ -692,6 +780,8 @@
             let winnerSeatsTotal = winnerPartiesResult.reduce((a, b) => a + b.seats, 0);
             winnerPartiesResult.forEach(p => { for(let i=0; i<p.seats; i++) allSeatsForHemicycle.push({ type: 'winner', party: p.name }); });
 
+            // Mayor is separate. 60% is COUNCIL seats.
+            
             finalOutput.push({
                 name: winningCoalition.name, isWinner: true, isApparented: false,
                 totalVotes: winningCoalition.totalVotes, // Candidate Total
@@ -861,6 +951,7 @@
         }
     }
 
+    // --- CRUD WRAPPERS ---
     function updateParty(cIndex, pIndex, field, value) { if(field === 'name') coalitions[cIndex].parties[pIndex].name = value; }
     function updatePartyValue(cIndex, pIndex, value) { coalitions[cIndex].parties[pIndex].value = value; recalcLiveTotals(); }
     function updateCoalitionName(cIndex, value) { coalitions[cIndex].name = value; }
@@ -875,25 +966,25 @@
         if(type === 'Pisa2023') {
             if(inputMode === 'percent') {
                  coalitions = [
-                    { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, mayorOnlyVotes: 3.0, parties: [
-                        { name: "Fratelli d'Italia", value: 16.9 }, { name: "Michele Conti Sindaco", value: 14.7 }, 
-                        { name: "Lega", value: 10.4 }, { name: "Pesciatini per Pisa", value: 4.8 }, 
-                        { name: "Forza Italia - UDC - PLI", value: 3.5 }, { name: "Pisa Punto Zero", value: 1.0 }
+                    { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, mayorOnlyVotes: 3.06, parties: [
+                        { name: "Fratelli d'Italia", value: 15.95 }, { name: "Michele Conti Sindaco", value: 13.60 }, 
+                        { name: "Lega", value: 9.67 }, { name: "Pesciatini per Pisa", value: 4.17 }, 
+                        { name: "Forza Italia - UDC - PLI", value: 2.80 }, { name: "Pisa Punto Zero", value: 0.71 }
                     ]},
-                    { id: 2, name: "Paolo Martinelli (Centrosinistra)", isWinner: false, isApparented: false, mayorOnlyVotes: 3.1, parties: [
-                        { name: "Partito Democratico", value: 23.9 }, { name: "La Città delle Persone", value: 5.6 }, 
-                        { name: "Sinistra Unita per Pisa", value: 4.9 }, { name: "Movimento 5 Stelle", value: 3.0 },
-                        { name: "Riformisti per Pisa", value: 2.2 }
+                    { id: 2, name: "Paolo Martinelli (Centrosinistra)", isWinner: false, isApparented: false, mayorOnlyVotes: 3.17, parties: [
+                        { name: "Partito Democratico", value: 22.00 }, { name: "La Città delle Persone", value: 6.30 }, 
+                        { name: "Sinistra Unita per Pisa", value: 4.73 }, { name: "Movimento 5 Stelle", value: 2.85 },
+                        { name: "Riformisti per Pisa", value: 2.07 }
                     ]},
-                    { id: 3, name: "Ciccio Auletta (Sinistra)", isWinner: false, isApparented: false, mayorOnlyVotes: 0.1, parties: [
-                        { name: "Una città in comune", value: 5.1 }, { name: "Unione Popolare", value: 1.4 }
+                    { id: 3, name: "Ciccio Auletta (Sinistra)", isWinner: false, isApparented: false, mayorOnlyVotes: 0.02, parties: [
+                        { name: "Una città in comune", value: 4.95 }, { name: "Unione Popolare", value: 1.76 }
                     ]},
-                     { id: 4, name: "Altri Candidati", isWinner: false, isApparented: false, mayorOnlyVotes: 0.2, parties: [
-                        { name: "Rita Mariotti (Terzo Polo)", value: 1.3 }, { name: "Alexandre Dei (Patto Civico)", value: 0.6 },
-                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 0.5 }
+                     { id: 4, name: "Altri Candidati", isWinner: false, isApparented: false, mayorOnlyVotes: 0.13, parties: [
+                        { name: "Rita Mariotti (Terzo Polo)", value: 1.26 }, { name: "Alexandre Dei (Patto Civico)", value: 0.61 },
+                        { name: "Edoardo Polacco (Comitato Libertà Toscana)", value: 0.19 }
                     ]}
                 ];
-                document.getElementById('estimatedTotalVotes').value = 40500;
+                document.getElementById('estimatedTotalVotes').value = 40211;
             } else {
                  coalitions = [
                     { id: 1, name: "Michele Conti (Centrodestra)", isWinner: true, isApparented: false, mayorOnlyVotes: 1229, parties: [
@@ -918,6 +1009,16 @@
             }
             renderCoalitions();
         }
+    }
+    function saveScenario() {
+        const data = { coalitions, inputMode, totalSeats: document.getElementById('totalSeats').value, threshold: document.getElementById('threshold').value, estimatedTotal: document.getElementById('estimatedTotalVotes').value };
+        localStorage.setItem('sim_v4_1', JSON.stringify(data)); alert("Saved successfully.");
+    }
+    function loadSavedScenario() {
+        const d = JSON.parse(localStorage.getItem('sim_v4_1')); if(!d) return alert("No saved data found.");
+        coalitions = d.coalitions; inputMode = d.inputMode;
+        document.getElementById('totalSeats').value = d.totalSeats; document.getElementById('threshold').value = d.threshold; document.getElementById('estimatedTotalVotes').value = d.estimatedTotal;
+        setInputMode(inputMode);
     }
     function copyToClipboard() { if(!textReport) return; navigator.clipboard.writeText(textReport).then(()=>alert("Copied to clipboard!")); }
 
