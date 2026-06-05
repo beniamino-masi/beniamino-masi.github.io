@@ -1,3 +1,104 @@
+/* ---------------------------------------------------------------------------
+   Self-hosted fonts (no third-party request to Google — GDPR-friendly).
+   Files live in /fonts and are sourced from the @fontsource npm packages.
+   Only the weights actually used by the site are included.
+--------------------------------------------------------------------------- */
+
+/* Inter — body text */
+
+@font-face {
+  font-family: "Inter";
+
+  font-style: normal;
+
+  font-weight: 400;
+
+  font-display: swap;
+
+  src: url("fonts/inter-latin-400-normal.woff2") format("woff2"),
+       url("fonts/inter-latin-400-normal.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Inter";
+
+  font-style: italic;
+
+  font-weight: 400;
+
+  font-display: swap;
+
+  src: url("fonts/inter-latin-400-italic.woff2") format("woff2"),
+       url("fonts/inter-latin-400-italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Inter";
+
+  font-style: normal;
+
+  font-weight: 500;
+
+  font-display: swap;
+
+  src: url("fonts/inter-latin-500-normal.woff2") format("woff2"),
+       url("fonts/inter-latin-500-normal.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Inter";
+
+  font-style: normal;
+
+  font-weight: 600;
+
+  font-display: swap;
+
+  src: url("fonts/inter-latin-600-normal.woff2") format("woff2"),
+       url("fonts/inter-latin-600-normal.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Inter";
+
+  font-style: normal;
+
+  font-weight: 700;
+
+  font-display: swap;
+
+  src: url("fonts/inter-latin-700-normal.woff2") format("woff2"),
+       url("fonts/inter-latin-700-normal.woff") format("woff");
+}
+
+/* Merriweather — headings */
+
+@font-face {
+  font-family: "Merriweather";
+
+  font-style: normal;
+
+  font-weight: 400;
+
+  font-display: swap;
+
+  src: url("fonts/merriweather-latin-400-normal.woff2") format("woff2"),
+       url("fonts/merriweather-latin-400-normal.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Merriweather";
+
+  font-style: normal;
+
+  font-weight: 700;
+
+  font-display: swap;
+
+  src: url("fonts/merriweather-latin-700-normal.woff2") format("woff2"),
+       url("fonts/merriweather-latin-700-normal.woff") format("woff");
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -106,9 +207,7 @@
   --tw-contain-style:  ;
 }
 
-/*
-! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com
-*/
+/* ! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com */
 
 /*
 1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
@@ -1132,6 +1231,18 @@ video {
   --tw-prose-invert-td-borders: #334155;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 .visible {
   visibility: visible;
 }
@@ -1263,6 +1374,10 @@ video {
 
 .mt-10 {
   margin-top: 2.5rem;
+}
+
+.mt-12 {
+  margin-top: 3rem;
 }
 
 .mt-4 {
@@ -1711,6 +1826,11 @@ video {
   background-color: rgb(16 185 129 / var(--tw-bg-opacity, 1));
 }
 
+.bg-amber-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 243 199 / var(--tw-bg-opacity, 1));
+}
+
 .bg-amber-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(255 251 235 / var(--tw-bg-opacity, 1));
@@ -2044,6 +2164,11 @@ video {
 .text-amber-600 {
   --tw-text-opacity: 1;
   color: rgb(217 119 6 / var(--tw-text-opacity, 1));
+}
+
+.text-amber-700 {
+  --tw-text-opacity: 1;
+  color: rgb(180 83 9 / var(--tw-text-opacity, 1));
 }
 
 .text-blue-600 {
@@ -2432,14 +2557,71 @@ video {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+.focus\:fixed:focus {
+  position: fixed;
+}
+
+.focus\:left-3:focus {
+  left: 0.75rem;
+}
+
+.focus\:top-3:focus {
+  top: 0.75rem;
+}
+
+.focus\:z-\[60\]:focus {
+  z-index: 60;
+}
+
+.focus\:rounded-lg:focus {
+  border-radius: 0.5rem;
+}
+
 .focus\:border-academic-600:focus {
   --tw-border-opacity: 1;
   border-color: rgb(0 59 112 / var(--tw-border-opacity, 1));
 }
 
+.focus\:bg-academic-600:focus {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 59 112 / var(--tw-bg-opacity, 1));
+}
+
 .focus\:bg-white:focus {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+}
+
+.focus\:px-4:focus {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.focus\:py-2:focus {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.focus\:text-white:focus {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.focus\:shadow-lg:focus {
+  --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 .focus\:outline-none:focus {

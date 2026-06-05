@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://beniamino-masi.github.io/sitemap.xml

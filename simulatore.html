@@ -5,17 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulatore Elettorale | Dr. Beniamino Masi</title>
     
-    <!-- Compiled Tailwind CSS (shared build — see BUILD.md) -->
+    <!-- Compiled Tailwind CSS + self-hosted @font-face (shared build — see BUILD.md) -->
     <link rel="stylesheet" href="style.css">
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
-
-    <!-- Icons (version pinned) -->
-    <script src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.min.js"></script>
+    <!-- Icons: lucide served locally (no third-party request); logic still uses createIcons() -->
+    <script src="lucide.min.js"></script>
     
     <style>
         ::-webkit-scrollbar { width: 8px; }
@@ -36,6 +32,8 @@
 </head>
 <body class="bg-academic-50 text-slate-700 antialiased leading-relaxed">
 
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:bg-academic-600 focus:text-white focus:rounded-lg focus:shadow-lg">Skip to content</a>
+
     <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
             <a href="index.html" class="text-sm font-medium text-slate-500 hover:text-academic-600 flex items-center transition-colors">
@@ -45,7 +43,7 @@
         </div>
     </nav>
 
-    <div class="max-w-6xl mx-auto px-6 py-12">
+    <div id="main-content" class="max-w-6xl mx-auto px-6 py-12">
         
         <header class="text-center mb-12">
             <h1 class="font-serif text-3xl md:text-4xl font-bold text-slate-900 mb-4">Municipal Election Simulator</h1>
@@ -95,6 +93,13 @@
                 <button onclick="openLoadModal()" class="flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
                     <i data-lucide="folder-open" class="w-4 h-4 mr-2"></i> Load
                 </button>
+                <button onclick="exportScenario()" class="flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
+                    <i data-lucide="download" class="w-4 h-4 mr-2"></i> Export
+                </button>
+                <button onclick="importScenario()" class="flex items-center px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 transition-colors">
+                    <i data-lucide="upload" class="w-4 h-4 mr-2"></i> Import
+                </button>
+                <input type="file" id="importFile" accept="application/json,.json" onchange="handleImportFile(event)" class="hidden">
                 <div class="flex-grow"></div>
                 <button onclick="loadScenario('Pisa2023')" class="flex items-center px-3 py-1.5 text-sm font-medium text-academic-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-100 transition-colors">
                     <i data-lucide="bar-chart-2" class="w-4 h-4 mr-2"></i> Load Pisa 2023 Results
@@ -282,6 +287,71 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(saves));
         closeModal();
         openLoadModal(); 
+    }
+
+    // --- Export / Import (portable JSON, works across browsers & machines) ---
+    function currentScenarioData() {
+        return {
+            _format: 'masi-election-sim-v1',
+            coalitions,
+            inputMode,
+            totalSeats: document.getElementById('totalSeats').value,
+            threshold: document.getElementById('threshold').value,
+            estimatedTotal: document.getElementById('estimatedTotalVotes').value,
+            exportedAt: new Date().toISOString()
+        };
+    }
+
+    function exportScenario() {
+        const blob = new Blob([JSON.stringify(currentScenarioData(), null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'election-scenario-' + new Date().toISOString().slice(0, 10) + '.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    function importScenario() {
+        document.getElementById('importFile').click();
+    }
+
+    function handleImportFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const d = JSON.parse(e.target.result);
+                if (!d || !Array.isArray(d.coalitions)) throw new Error('not a valid scenario file');
+                coalitions = d.coalitions;
+                inputMode = d.inputMode || 'votes';
+                document.getElementById('totalSeats').value = d.totalSeats ?? 32;
+                document.getElementById('threshold').value = d.threshold ?? 3;
+                document.getElementById('estimatedTotalVotes').value = d.estimatedTotal ?? 0;
+                // Sync the mode toggle UI without re-running the value conversion in setInputMode
+                const btnVotes = document.getElementById('modeVotes');
+                const btnPercent = document.getElementById('modePercent');
+                const statusBar = document.getElementById('percentStatusBar');
+                if (inputMode === 'votes') {
+                    btnVotes.className = "flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-white bg-academic-600 shadow-sm";
+                    btnPercent.className = "flex-1 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-900 transition-all";
+                    statusBar.classList.add('hidden');
+                } else {
+                    btnPercent.className = "flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-white bg-academic-600 shadow-sm";
+                    btnVotes.className = "flex-1 py-1.5 text-sm font-medium rounded-md text-slate-500 hover:text-slate-900 transition-all";
+                    statusBar.classList.remove('hidden');
+                }
+                renderCoalitions();
+                recalcLiveTotals();
+            } catch (err) {
+                alert('Could not import this file: ' + err.message);
+            }
+            event.target.value = ''; // allow re-importing the same file
+        };
+        reader.readAsText(file);
     }
 
     function setInputMode(mode) {
@@ -970,6 +1040,9 @@
                 svg.appendChild(circle);
             }
         }
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-label',
+            `Council hemicycle: ${totalMajority} seats for the winning majority and ${totalOpposition} for the opposition, out of ${totalSeats} total. A full per-party breakdown is listed in the results below.`);
     }
 
     // --- CRUD WRAPPERS ---

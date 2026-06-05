@@ -51,17 +51,99 @@
       ]
     }
     </script>
-    
-    <!-- Compiled Tailwind CSS (built locally with the Tailwind CLI — see BUILD.md) -->
+
+    <!-- PUBS-JSONLD:START -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "ScholarlyArticle",
+          "headline": "Measuring political representation in Italy: A VAA-based analysis of the 2022 election",
+          "author": [
+            {
+              "@type": "Person",
+              "name": "Beniamino Masi"
+            }
+          ],
+          "datePublished": "2026",
+          "isPartOf": {
+            "@type": "Periodical",
+            "name": "Contemporary Italian Politics"
+          },
+          "sameAs": "https://doi.org/10.1080/23248823.2026.2629096"
+        },
+        {
+          "@type": "ScholarlyArticle",
+          "headline": "Do parties converge? An empirical analysis of party organizational and policy issue saliency change in Western Europe (1970–2010)",
+          "author": [
+            {
+              "@type": "Person",
+              "name": "Eugenio Pizzimenti"
+            },
+            {
+              "@type": "Person",
+              "name": "Enrico Calossi"
+            },
+            {
+              "@type": "Person",
+              "name": "Lorenzo Cicchi"
+            },
+            {
+              "@type": "Person",
+              "name": "Beniamino Masi"
+            }
+          ],
+          "datePublished": "2022",
+          "isPartOf": {
+            "@type": "Periodical",
+            "name": "Journal of Contemporary European Studies"
+          },
+          "sameAs": "https://doi.org/10.1080/14782804.2022.2119215"
+        },
+        {
+          "@type": "ScholarlyArticle",
+          "headline": "The Political Foundations of Party Organizational Change",
+          "author": [
+            {
+              "@type": "Person",
+              "name": "Beniamino Masi"
+            },
+            {
+              "@type": "Person",
+              "name": "Eugenio Pizzimenti"
+            }
+          ],
+          "datePublished": "2022",
+          "isPartOf": {
+            "@type": "Periodical",
+            "name": "Comparative European Politics"
+          },
+          "sameAs": "https://doi.org/10.1057/s41295-022-00299-0"
+        },
+        {
+          "@type": "ScholarlyArticle",
+          "headline": "Looking through the mirror: representativeness of the Italian party system before the 2018 General Election",
+          "author": [
+            {
+              "@type": "Person",
+              "name": "Beniamino Masi"
+            }
+          ],
+          "datePublished": "2021",
+          "isPartOf": {
+            "@type": "Periodical",
+            "name": "Italian Journal of Electoral Studies"
+          },
+          "sameAs": "https://doi.org/10.36253/qoe-10237"
+        }
+      ]
+    }
+    </script>
+                    <!-- PUBS-JSONLD:END -->
+
+    <!-- Compiled Tailwind CSS + self-hosted @font-face (built locally — see BUILD.md) -->
     <link rel="stylesheet" href="style.css">
-
-    <!-- Fonts: Merriweather (Serif) for headings, Inter (Sans) for body -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
-
-    <!-- Icons (version pinned so an upstream release can't silently break them) -->
-    <script src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.min.js"></script>
     
     <style>
         /* Custom scrollbar for webkit */
@@ -92,19 +174,22 @@
 </head>
 <body class="bg-academic-50 text-slate-700 antialiased leading-relaxed selection:bg-slate-200 selection:text-slate-900">
 
+    <!-- Skip link for keyboard / screen-reader users -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:bg-academic-600 focus:text-white focus:rounded-lg focus:shadow-lg">Skip to content</a>
+
     <!-- Mobile Navigation Toggle -->
     <div class="md:hidden fixed top-4 right-4 z-50">
-        <button id="menu-btn" class="p-2 bg-white rounded-full shadow-md text-slate-800 hover:bg-slate-50 transition-colors">
-            <i data-lucide="menu" class="w-6 h-6"></i>
+        <button id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu" class="p-2 bg-white rounded-full shadow-md text-slate-800 hover:bg-slate-50 transition-colors">
+            <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M4 5h16" /><path d="M4 12h16" /><path d="M4 19h16" /></svg>
         </button>
     </div>
 
     <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu" class="fixed inset-0 bg-white/95 backdrop-blur-sm z-40 transform translate-x-full transition-transform duration-300 md:hidden flex flex-col justify-center items-center space-y-8">
+    <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Site navigation" aria-hidden="true" inert class="fixed inset-0 bg-white/95 backdrop-blur-sm z-40 transform translate-x-full transition-transform duration-300 md:hidden flex flex-col justify-center items-center space-y-8">
         <a href="#home" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Home</a>
         <a href="#about" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">About</a>
         <a href="#publications" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Publications</a>
-        <a href="#projects" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Projects</a>
+        <a href="#projects" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Side Projects</a>
         <a href="#teaching" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Teaching</a>
         <a href="#contact" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Contact</a>
          <a href="CV.pdf" class="mobile-link text-2xl font-serif text-slate-900" onclick="closeMenu()">Download CV</a>
@@ -133,7 +218,7 @@
 
                     <!-- Social Icons -->
                     <div class="flex space-x-4 text-slate-400">
-                        <a href="https://scholar.google.it/citations?user=iS07mWMAAAAJ&hl=it&oi=ao" target="_blank" class="hover:text-academic-600 transition-colors" title="Google Scholar"><i data-lucide="graduation-cap" class="w-5 h-5"></i></a>
+                        <a href="https://scholar.google.it/citations?user=iS07mWMAAAAJ&hl=it&oi=ao" target="_blank" class="hover:text-academic-600 transition-colors" title="Google Scholar"><svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" /><path d="M22 10v6" /><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" /></svg></a>
                         <a href="https://orcid.org/0000-0001-5568-8373" target="_blank" class="transition-opacity hover:opacity-80" title="ORCID" aria-label="ORCID profile">
                             <svg class="w-5 h-5" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
                                 <path fill="#A6CE39" d="M256 128c0 70.7-57.3 128-128 128S0 198.7 0 128 57.3 0 128 0s128 57.3 128 128z"/>
@@ -145,7 +230,7 @@
                             </svg>
                         </a>
                         <!-- Add other links if available -->
-                        <a href="mailto:beniamino.masi@unipi.it" class="hover:text-academic-600 transition-colors" title="Email"><i data-lucide="mail" class="w-5 h-5"></i></a>
+                        <a href="mailto:beniamino.masi@unipi.it" class="hover:text-academic-600 transition-colors" title="Email"><svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /><rect x="2" y="4" width="20" height="16" rx="2" /></svg></a>
                     </div>
                 </div>
 
@@ -153,27 +238,27 @@
                 <nav class="hidden md:block space-y-3">
                     <a href="#about" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">About</a>
                     <a href="#publications" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">Publications</a>
-                    <a href="#projects" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">Projects</a>
+                    <a href="#projects" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">Side Projects</a>
                     <a href="#teaching" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">Teaching</a>
                     <a href="#contact" class="block text-slate-500 hover:text-academic-600 transition-colors hover:translate-x-1 duration-200">Contact</a>
                     
                     <!-- Link updated to point to 'cv.pdf' -->
                     <a href="CV.pdf" target="_blank" class="inline-flex items-center mt-6 text-sm font-medium text-academic-600 hover:underline">
-                        Download CV <i data-lucide="arrow-down-to-line" class="w-4 h-4 ml-2"></i>
+                        Download CV <svg class="w-4 h-4 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 17V3" /><path d="m6 11 6 6 6-6" /><path d="M19 21H5" /></svg>
                     </a>
                 </nav>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 space-y-24">
+        <main id="main-content" class="flex-1 space-y-24">
             
             <!-- About Section -->
             <section id="about" class="fade-in">
                 <h2 class="font-serif text-3xl text-slate-900 mb-6 pb-2 border-b border-slate-200">About Me</h2>
                 <div class="prose prose-slate max-w-none text-slate-600">
                     <p class="mb-4">
-                        I am a Post-doctoral Researcher at the <strong>University of Pisa</strong> (since December 2025), currently working on the research project <strong><a href="https://www.watersens.eu/" target="_blank" class="text-academic-600 hover:underline decoration-1 underline-offset-2">WATERSENS</a></strong>. My work lies at the intersection of comparative politics, party organization, and European policy.
+                        I am a Post-doctoral Researcher at the <strong>University of Pisa</strong> (since December 2025), working on the research project <strong><a href="https://www.watersens.eu/" target="_blank" class="text-academic-600 hover:underline decoration-1 underline-offset-2">WATERSENS</a></strong>. I am a comparative political scientist: my work uses cross-national comparison and policy analysis to study how political organizations and institutions adapt to structural change — a single thread running from the long-run transformation of political parties in Western Europe to the governance of the ecological and water transition in the European Union.
                     </p>
                     <p class="mb-4">
                         Previously, I served as a Post-doctoral Researcher at the <strong>University of Padua</strong> (2023–2025), working on the project <strong><a href="https://www.ecosocialproject.com/" target="_blank" class="text-academic-600 hover:underline decoration-1 underline-offset-2">"Governing the 'Just Transition': Eco-social Politics and Policies in the EU"</a></strong>.
@@ -182,7 +267,7 @@
                         I received my PhD in Political Science from the <strong>University of Pisa</strong> in 2024, with a thesis titled <em>"Patterns of party organizational change. Convergence and disintermediation in Europe (1969-2017)"</em>.
                     </p>
                     <p>
-                        My research interests include the evolution of political parties in Western Europe, intra-party democracy, and the political implications of the green transition. I also serve as the Communication Officer for the "Political Parties, Party Systems and Elections" Research Network of the Council for European Studies.
+                        My research interests span the evolution of political parties in Western Europe, intra-party democracy, and the politics of the green and just transition. Methodologically I work in the comparative tradition, combining cross-national designs with case-based process-tracing and mixed methods. I also serve as the Communication Officer for the "Political Parties, Party Systems and Elections" Research Network of the Council for European Studies.
                     </p>
                 </div>
 
@@ -211,7 +296,35 @@
                 <h2 class="font-serif text-3xl text-slate-900 mb-8 pb-2 border-b border-slate-200">Selected Publications</h2>
                 
                 <div class="space-y-10">
-                    <!-- Paper 1 -->
+                    
+                    <!-- PUBS:START -->
+                    <article class="group relative">
+                        <div class="absolute -left-4 -top-4 w-full h-full bg-slate-50 opacity-0 group-hover:opacity-50 transition-opacity -z-10 rounded-lg"></div>
+                        <h3 class="text-lg font-semibold text-slate-800 mb-1 leading-snug">
+                            <a href="https://doi.org/10.1080/23248823.2026.2629096" target="_blank" class="hover:text-academic-600 transition-colors">Measuring political representation in Italy: A VAA-based analysis of the 2022 election</a>
+                        </h3>
+                        <p class="text-slate-600 mb-2">
+                            <span class="font-medium text-slate-900">Masi B.</span>
+                        </p>
+                        <p class="italic text-slate-500 text-sm mb-3">
+                            Contemporary Italian Politics (2026).
+                        </p>
+                        <div class="flex gap-3 text-xs font-bold tracking-wide">
+                            <a href="https://doi.org/10.1080/23248823.2026.2629096" target="_blank" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">DOI</a>
+                            <button onclick="toggleBibtex('bib1')" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">BibTeX</button>
+                        </div>
+                        <div id="bib1" class="hidden mt-4 p-4 bg-slate-100 rounded text-xs font-mono text-slate-600 overflow-x-auto">
+                            @article{masi2026measuring,<br>
+&nbsp;&nbsp;title={Measuring political representation in Italy: A VAA-based analysis of the 2022 election},<br>
+&nbsp;&nbsp;author={Masi, Beniamino},<br>
+&nbsp;&nbsp;journal={Contemporary Italian Politics},<br>
+&nbsp;&nbsp;year={2026},<br>
+&nbsp;&nbsp;publisher={Informa UK Limited},<br>
+&nbsp;&nbsp;doi={10.1080/23248823.2026.2629096}<br>
+}
+                        </div>
+                    </article>
+
                     <article class="group relative">
                         <div class="absolute -left-4 -top-4 w-full h-full bg-slate-50 opacity-0 group-hover:opacity-50 transition-opacity -z-10 rounded-lg"></div>
                         <h3 class="text-lg font-semibold text-slate-800 mb-1 leading-snug">
@@ -225,21 +338,22 @@
                         </p>
                         <div class="flex gap-3 text-xs font-bold tracking-wide">
                             <a href="https://doi.org/10.1080/14782804.2022.2119215" target="_blank" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">DOI</a>
-                            <button onclick="toggleBibtex('bib1')" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">BibTeX</button>
+                            <button onclick="toggleBibtex('bib2')" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">BibTeX</button>
                         </div>
-                        <div id="bib1" class="hidden mt-4 p-4 bg-slate-100 rounded text-xs font-mono text-slate-600 overflow-x-auto">
-                            @article{pizzimenti2022converge,<br>
-                              &nbsp;&nbsp;title={Do parties converge? An empirical analysis of party organizational and policy issue saliency change in Western Europe (1970–2010)},<br>
-                              &nbsp;&nbsp;author={Pizzimenti, Eugenio and Calossi, Enrico and Cicchi, Lorenzo and Masi, Beniamino},<br>
-                              &nbsp;&nbsp;journal={Journal of Contemporary European Studies},<br>
-                              &nbsp;&nbsp;year={2022},<br>
-                              &nbsp;&nbsp;publisher={Taylor & Francis}<br>
-                            }
+                        <div id="bib2" class="hidden mt-4 p-4 bg-slate-100 rounded text-xs font-mono text-slate-600 overflow-x-auto">
+                            @article{pizzimenti2022do,<br>
+&nbsp;&nbsp;title={Do parties converge? An empirical analysis of party organizational and policy issue saliency change in Western Europe (1970–2010)},<br>
+&nbsp;&nbsp;author={Pizzimenti, Eugenio and Calossi, Enrico and Cicchi, Lorenzo and Masi, Beniamino},<br>
+&nbsp;&nbsp;journal={Journal of Contemporary European Studies},<br>
+&nbsp;&nbsp;year={2022},<br>
+&nbsp;&nbsp;publisher={Informa UK Limited},<br>
+&nbsp;&nbsp;doi={10.1080/14782804.2022.2119215}<br>
+}
                         </div>
                     </article>
 
-                    <!-- Paper 2 -->
                     <article class="group relative">
+                        <div class="absolute -left-4 -top-4 w-full h-full bg-slate-50 opacity-0 group-hover:opacity-50 transition-opacity -z-10 rounded-lg"></div>
                         <h3 class="text-lg font-semibold text-slate-800 mb-1 leading-snug">
                             <a href="https://doi.org/10.1057/s41295-022-00299-0" target="_blank" class="hover:text-academic-600 transition-colors">The Political Foundations of Party Organizational Change</a>
                         </h3>
@@ -250,22 +364,23 @@
                             Comparative European Politics (2022).
                         </p>
                         <div class="flex gap-3 text-xs font-bold tracking-wide">
-                             <a href="https://doi.org/10.1057/s41295-022-00299-0" target="_blank" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">DOI</a>
-                             <button onclick="toggleBibtex('bib2')" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">BibTeX</button>
+                            <a href="https://doi.org/10.1057/s41295-022-00299-0" target="_blank" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">DOI</a>
+                            <button onclick="toggleBibtex('bib3')" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">BibTeX</button>
                         </div>
-                        <div id="bib2" class="hidden mt-4 p-4 bg-slate-100 rounded text-xs font-mono text-slate-600 overflow-x-auto">
-                            @article{masi2022political,<br>
-                              &nbsp;&nbsp;title={The Political Foundations of Party Organizational Change},<br>
-                              &nbsp;&nbsp;author={Masi, Beniamino and Pizzimenti, Eugenio},<br>
-                              &nbsp;&nbsp;journal={Comparative European Politics},<br>
-                              &nbsp;&nbsp;year={2022},<br>
-                              &nbsp;&nbsp;publisher={Springer}<br>
-                            }
+                        <div id="bib3" class="hidden mt-4 p-4 bg-slate-100 rounded text-xs font-mono text-slate-600 overflow-x-auto">
+                            @article{masi2022the,<br>
+&nbsp;&nbsp;title={The Political Foundations of Party Organizational Change},<br>
+&nbsp;&nbsp;author={Masi, Beniamino and Pizzimenti, Eugenio},<br>
+&nbsp;&nbsp;journal={Comparative European Politics},<br>
+&nbsp;&nbsp;year={2022},<br>
+&nbsp;&nbsp;publisher={Springer Science and Business Media LLC},<br>
+&nbsp;&nbsp;doi={10.1057/s41295-022-00299-0}<br>
+}
                         </div>
                     </article>
 
-                    <!-- Paper 3 -->
                     <article class="group relative">
+                        <div class="absolute -left-4 -top-4 w-full h-full bg-slate-50 opacity-0 group-hover:opacity-50 transition-opacity -z-10 rounded-lg"></div>
                         <h3 class="text-lg font-semibold text-slate-800 mb-1 leading-snug">
                             <a href="https://doi.org/10.36253/qoe-10237" target="_blank" class="hover:text-academic-600 transition-colors">Looking through the mirror: representativeness of the Italian party system before the 2018 General Election</a>
                         </h3>
@@ -277,20 +392,23 @@
                         </p>
                         <div class="flex gap-3 text-xs font-bold tracking-wide">
                             <a href="https://doi.org/10.36253/qoe-10237" target="_blank" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">DOI</a>
-                            <button onclick="toggleBibtex('bib3')" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">BibTeX</button>
+                            <button onclick="toggleBibtex('bib4')" class="px-2 py-1 rounded border border-slate-300 text-slate-500 hover:bg-slate-800 hover:text-white hover:border-transparent transition-all">BibTeX</button>
                         </div>
-                        <div id="bib3" class="hidden mt-4 p-4 bg-slate-100 rounded text-xs font-mono text-slate-600 overflow-x-auto">
+                        <div id="bib4" class="hidden mt-4 p-4 bg-slate-100 rounded text-xs font-mono text-slate-600 overflow-x-auto">
                             @article{masi2021looking,<br>
-                              &nbsp;&nbsp;title={Looking through the mirror: representativeness of the Italian party system before the 2018 General Election},<br>
-                              &nbsp;&nbsp;author={Masi, Beniamino},<br>
-                              &nbsp;&nbsp;journal={Italian Journal of Electoral Studies},<br>
-                              &nbsp;&nbsp;volume={84},<br>
-                              &nbsp;&nbsp;number={1},<br>
-                              &nbsp;&nbsp;pages={69--83},<br>
-                              &nbsp;&nbsp;year={2021}<br>
-                            }
+&nbsp;&nbsp;title={Looking through the mirror: representativeness of the Italian party system before the 2018 General Election},<br>
+&nbsp;&nbsp;author={Masi, Beniamino},<br>
+&nbsp;&nbsp;journal={Italian Journal of Electoral Studies},<br>
+&nbsp;&nbsp;volume={84},<br>
+&nbsp;&nbsp;pages={69-83},<br>
+&nbsp;&nbsp;year={2021},<br>
+&nbsp;&nbsp;publisher={Firenze University Press},<br>
+&nbsp;&nbsp;doi={10.36253/qoe-10237}<br>
+}
                         </div>
                     </article>
+                    <!-- PUBS:END -->
+
                     
                     <a href="https://scholar.google.it/citations?user=iS07mWMAAAAJ&hl=it&oi=ao" target="_blank" class="inline-block mt-4 text-sm font-medium text-academic-600 hover:text-slate-900 transition-colors">
                         View Full Google Scholar Profile &rarr;
@@ -300,14 +418,14 @@
 
              <!-- Projects Section -->
              <section id="projects" class="fade-in">
-                <h2 class="font-serif text-3xl text-slate-900 mb-8 pb-2 border-b border-slate-200">Projects</h2>
+                <h2 class="font-serif text-3xl text-slate-900 mb-8 pb-2 border-b border-slate-200">Side Projects</h2>
                 
                 <div class="grid md:grid-cols-2 gap-8">
                     <!-- Project 1 -->
                     <div class="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                         <div class="flex justify-between items-start mb-4">
                             <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                                <i data-lucide="calculator" class="w-6 h-6"></i>
+                                <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><rect x="4" y="2" width="16" height="20" rx="2" /><line x1="8" x2="16" y1="6" y2="6" /><line x1="16" x2="16" y1="14" y2="18" /><path d="M16 10h.01" /><path d="M12 10h.01" /><path d="M8 10h.01" /><path d="M12 14h.01" /><path d="M8 14h.01" /><path d="M12 18h.01" /><path d="M8 18h.01" /></svg>
                             </div>
                             <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded uppercase tracking-wide">Tool</span>
                         </div>
@@ -317,7 +435,7 @@
                         </p>
                         <div class="flex gap-4 items-center mt-auto">
                             <a href="simulatore.html" target="_blank" class="text-sm font-medium text-academic-600 hover:text-slate-900 flex items-center transition-colors">
-                                Launch Tool <i data-lucide="external-link" class="w-4 h-4 ml-1"></i>
+                                Launch Tool <svg class="w-4 h-4 ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></svg>
                             </a>
                         </div>
                     </div>
@@ -353,7 +471,7 @@
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <a href="mailto:beniamino.masi@unipi.it" id="email-text" class="text-xl md:text-2xl font-serif text-slate-800 hover:text-academic-600 transition-colors select-all">beniamino.masi@unipi.it</a>
                         <button onclick="copyEmail()" class="text-slate-400 hover:text-academic-600 transition-colors p-1" title="Copy to clipboard">
-                            <i data-lucide="copy" class="w-5 h-5"></i>
+                            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><rect x="8" y="8" width="14" height="14" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
                         </button>
                     </div>
                     <p id="copy-feedback" class="text-xs text-green-600 h-4 opacity-0 transition-opacity">Copied to clipboard!</p>
@@ -371,7 +489,6 @@
 
     <script>
         // Initialize Icons
-        lucide.createIcons();
 
         // Dynamic Year
         document.getElementById('year').textContent = new Date().getFullYear();
@@ -398,29 +515,39 @@
             });
         }
 
-        // Mobile Menu
+        // Mobile Menu (with accessibility: aria-expanded, inert, focus management, Esc to close)
         const menuBtn = document.getElementById('menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
+        const ICON_MENU = '<svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M4 5h16" /><path d="M4 12h16" /><path d="M4 19h16" /></svg>';
+        const ICON_X = '<svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>';
         let isMenuOpen = false;
 
-        menuBtn.addEventListener('click', () => {
-            isMenuOpen = !isMenuOpen;
-            if (isMenuOpen) {
-                mobileMenu.classList.remove('translate-x-full');
-                menuBtn.innerHTML = '<i data-lucide="x" class="w-6 h-6"></i>';
-            } else {
-                mobileMenu.classList.add('translate-x-full');
-                menuBtn.innerHTML = '<i data-lucide="menu" class="w-6 h-6"></i>';
-            }
-            lucide.createIcons();
-        });
+        function openMenu() {
+            isMenuOpen = true;
+            mobileMenu.classList.remove('translate-x-full');
+            mobileMenu.removeAttribute('inert');
+            mobileMenu.setAttribute('aria-hidden', 'false');
+            menuBtn.setAttribute('aria-expanded', 'true');
+            menuBtn.setAttribute('aria-label', 'Close menu');
+            menuBtn.innerHTML = ICON_X;
+            // move focus into the menu for keyboard users
+            const firstLink = mobileMenu.querySelector('a');
+            if (firstLink) firstLink.focus();
+        }
 
         function closeMenu() {
             isMenuOpen = false;
             mobileMenu.classList.add('translate-x-full');
-            menuBtn.innerHTML = '<i data-lucide="menu" class="w-6 h-6"></i>';
-            lucide.createIcons();
+            mobileMenu.setAttribute('inert', '');
+            mobileMenu.setAttribute('aria-hidden', 'true');
+            menuBtn.setAttribute('aria-expanded', 'false');
+            menuBtn.setAttribute('aria-label', 'Open menu');
+            menuBtn.innerHTML = ICON_MENU;
+            menuBtn.focus();
         }
+
+        menuBtn.addEventListener('click', () => { isMenuOpen ? closeMenu() : openMenu(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isMenuOpen) closeMenu(); });
 
         // Intersection Observer for Fade-in animations
         const observerOptions = {
@@ -444,3 +571,9 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
